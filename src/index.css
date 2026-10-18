@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --radius: 0.25rem;
+  --background: oklch(14% 0.03 265);
+  --foreground: oklch(97% 0.01 90);
+  --card: oklch(20% 0.05 265);
+  --card-foreground: oklch(97% 0.01 90);
+  --popover: oklch(20% 0.05 265);
+  --popover-foreground: oklch(97% 0.01 90);
+  --primary: oklch(60% 0.23 27);
+  --primary-foreground: oklch(98% 0 0);
+  --secondary: oklch(52% 0.2 262);
+  --secondary-foreground: oklch(98% 0 0);
+  --muted: oklch(25% 0.05 265);
+  --muted-foreground: oklch(75% 0.03 265);
+  --accent: oklch(88% 0.18 95);
+  --accent-foreground: oklch(15% 0.03 265);
+  --destructive: oklch(60% 0.23 27);
+  --destructive-foreground: oklch(98% 0 0);
+  --border: oklch(5% 0.01 265);
+  --input: oklch(30% 0.05 265);
+  --ring: oklch(88% 0.18 95);
+  --ink: oklch(5% 0.01 265);
+  --xp: oklch(82% 0.2 150);
+  --shadow-comic: 5px 5px 0 0 var(--ink);
+  --shadow-comic-lg: 8px 8px 0 0 var(--ink);
+  --gradient-hero: linear-gradient(90deg, var(--background) 25%, transparent 75%);
+  --gradient-xp: linear-gradient(90deg, var(--primary), var(--accent));
+  --font-comic: Bangers, system-ui, sans-serif;
+  --font-pixel: "Press Start 2P", monospace;
+  --font-sans: "Space Grotesk", system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+.comic-title {
+  font-family: var(--font-comic);
+  letter-spacing: 0.04em;
+  -webkit-text-stroke: 1.5px var(--ink);
+  text-shadow: 4px 4px 0 var(--ink);
+}
+
+.speech {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow-comic);
+  position: relative;
+}
+
+.speech:after {
+  content: "";
+  border-style: solid;
+  border-width: 16px 14px 0 0;
+  border-color: var(--ink) transparent transparent transparent;
+  position: absolute;
+  bottom: -16px;
+  left: 28px;
+}
+
+.xp-bar {
+  background: var(--gradient-xp);
+  transform-origin: 0;
+  animation: 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) both xp-fill;
+}
+
+.comic-panel {
+  background: var(--card);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow-comic);
+  border-radius: var(--radius);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.comic-hover:hover {
+  box-shadow: var(--shadow-comic-lg);
+  transform: translate(-3px, -3px);
+}
+
+.halftone {
+  background-image: radial-gradient(var(--ink) 1.2px, transparent 1.6px);
+  background-size: 8px 8px;
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+  .halftone {
+    background-image: radial-gradient(color-mix(in oklab, var(--ink) 55%, transparent) 1.2px, transparent 1.6px);
+  }
+}
+
+.glitch {
+  animation: 3s step-end infinite glitch;
+}
+
+.blink {
+  animation: 1s step-end infinite blink;
+}
