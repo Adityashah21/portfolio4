@@ -27,8 +27,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({
 
         <div className="mb-10 flex flex-wrap items-center justify-between gap-5 border-b border-border pb-6">
           <p className="max-w-lg leading-7 text-muted-foreground">
-            Every skill is another tool in the inventory. The experience keeps
-            adding up.
+            Comprehensive technical competencies across modern frontend frameworks, backend runtimes, database architecture, and core computer science.
           </p>
           <span className="inline-flex items-center gap-2 font-pixel text-[10px] text-xp">
             <Zap className="size-5" /> {totalXp} TOTAL XP

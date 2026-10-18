@@ -22,8 +22,7 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
         </h2>
       </div>
       <p className="mb-10 max-w-xl leading-7 text-muted-foreground">
-        Milestones collected along the way. Each one marks another step in the
-        engineering journey.
+        Verified technical certifications and national hackathon achievements recognized by premier academic institutions and innovation bodies.
       </p>
 
       {certifications.length === 0 && (

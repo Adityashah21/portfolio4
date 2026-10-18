@@ -39,8 +39,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) =>
         </h2>
       </div>
       <p className="mb-10 max-w-xl leading-7 text-muted-foreground">
-        Ideas turned into playable checkpoints. Explore the projects, jump into a
-        live build, or look under the hood.
+        Production-grade web platforms, real-time messaging architectures, and full-stack solutions. Explore deployed applications and source repositories below.
       </p>
 
       {projects.length === 0 && (

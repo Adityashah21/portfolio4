@@ -6,32 +6,32 @@ export const PlaybookSection: React.FC = () => {
   const steps = [
     {
       icon: Lightbulb,
-      title: "Discover",
-      copy: "Start with a question. Find a problem worth exploring.",
+      title: "Architect",
+      copy: "Analyze system requirements, data flow, and user workflows to establish an optimal architectural foundation.",
     },
     {
       icon: BookOpen,
-      title: "Learn",
-      copy: "Understand the tools and connect the dots.",
+      title: "Design",
+      copy: "Select targeted tech stacks (MERN, Socket.IO, Tailwind) and construct robust data schemas and API contracts.",
     },
     {
       icon: Wrench,
-      title: "Build",
-      copy: "Turn the idea into something you can try.",
+      title: "Engineer",
+      copy: "Write clean, modular code with secure JWT authentication, bidirectional event sockets, and responsive interfaces.",
     },
     {
       icon: Rocket,
-      title: "Improve",
-      copy: "Test, learn from the result, and take the next step.",
+      title: "Ship & Iterate",
+      copy: "Benchmark algorithmic performance, validate edge cases, and deploy reliable production releases.",
     },
   ];
 
   return (
     <section id="process" className="portfolio-shell py-24 md:py-28" data-reveal>
       <SectionHeader
-        issue="MISSION PLAYBOOK"
-        title="FROM IDEA TO CHECKPOINT"
-        subtitle="The mindset behind the next build: stay curious, experiment, and keep improving."
+        issue="ENGINEERING PLAYBOOK"
+        title="HOW I BUILD &amp; SHIP"
+        subtitle="A disciplined, structured methodology transforming real-world problem statements into scalable software."
       />
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

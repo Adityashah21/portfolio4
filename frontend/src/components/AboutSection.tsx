@@ -25,9 +25,9 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
         <div className="signal-track flex w-max items-center gap-10 font-comic text-2xl">
           {[0, 1, 2, 3].map((idx) => (
             <span key={idx} className="flex items-center gap-10">
-              <Zap className="size-5" /> ENGINEER IN THE MAKING{" "}
-              <Crosshair className="size-5" /> ONE QUEST AT A TIME{" "}
-              <Gamepad2 className="size-5" /> PLAYER ONE ENERGY
+              <Zap className="size-5" /> FULL-STACK MERN ARCHITECTURE{" "}
+              <Crosshair className="size-5" /> REAL-TIME SOCKET.IO SYSTEMS{" "}
+              <Gamepad2 className="size-5" /> 150+ DSA PROBLEMS SOLVED
             </span>
           ))}
         </div>
@@ -41,8 +41,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
       >
         <SectionHeader
           issue="THE ORIGIN STORY"
-          title="BEHIND THE MASK"
-          subtitle="An engineering student. A gamer. A fan of stories where ordinary people do extraordinary things."
+          title="BEHIND THE CODE"
+          subtitle="Full-Stack Developer (MERN) &amp; B.Tech CSE Student — turning complex engineering challenges into elegant, resilient software."
         />
 
         <div className="grid items-center gap-10 lg:grid-cols-2">
@@ -67,39 +67,39 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
               PLAYER PROFILE / ADITYA SHAH
             </p>
             <h3 className="mt-4 font-comic text-4xl">
-              NO SUPERPOWERS. JUST CURIOSITY.
+              ENGINEERED WITH PRECISION &amp; PASSION.
             </h3>
             <p className="mt-5 leading-7 text-muted-foreground">
-              I’m Aditya, an engineering student at Greater Noida Institute of
-              Technology. This is my corner of the web: the things I build, the
-              skills I pick up, and the milestones along the way.
+              I am Aditya Shah, a Computer Science &amp; Engineering undergraduate at Greater Noida Institute of Technology (&apos;23–&apos;27) and a Full-Stack MERN Developer. I specialize in designing scalable web architectures, event-driven real-time applications with Socket.IO, and secure RESTful services.
             </p>
             <p className="mt-4 leading-7 text-muted-foreground">
-              Spider-Man and gaming are two things I love. So this portfolio is
-              a little less ordinary — a collection of quests, experience
-              points, and a story that’s still being written.
+              With 150+ Data Structures &amp; Algorithms challenges solved and multiple deployed production platforms under my belt, I bridge backend performance with intuitive front-end engineering. This portfolio showcases verified projects, technical competencies, and hackathon milestones.
             </p>
 
             <dl className="mt-7 divide-y divide-border border-y border-border">
               <div className="flex justify-between gap-4 py-3">
                 <dt className="text-muted-foreground">Class</dt>
-                <dd className="font-bold">Engineering student</dd>
+                <dd className="font-bold">Full Stack Developer (MERN)</dd>
               </div>
               <div className="flex justify-between gap-4 py-3">
                 <dt className="text-muted-foreground">Guild</dt>
                 <dd className="max-w-[70%] text-right font-bold">
-                  Greater Noida Institute of Technology
+                  Greater Noida Institute of Tech (CSE &apos;27)
                 </dd>
               </div>
               <div className="flex justify-between gap-4 py-3">
-                <dt className="text-muted-foreground">Side quests</dt>
-                <dd className="font-bold">Gaming &amp; comics</dd>
+                <dt className="text-muted-foreground">Core Focus</dt>
+                <dd className="font-bold">Web Architectures &amp; Real-Time Systems</dd>
+              </div>
+              <div className="flex justify-between gap-4 py-3">
+                <dt className="text-muted-foreground">DSA Record</dt>
+                <dd className="font-bold">150+ Problems Solved</dd>
               </div>
               <div className="flex items-center justify-between gap-4 py-3">
                 <dt className="text-muted-foreground">Equipped Links</dt>
                 <dd className="flex items-center gap-2">
                   <a
-                    href="https://github.com/"
+                    href="https://github.com/Adityashah21"
                     target="_blank"
                     rel="noreferrer"
                     className="border border-ink bg-muted p-1.5 hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -108,7 +108,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                     <GithubIcon className="size-3.5" />
                   </a>
                   <a
-                    href="https://linkedin.com/in/"
+                    href="https://linkedin.com/in/aditya-shah-80040232a"
                     target="_blank"
                     rel="noreferrer"
                     className="border border-ink bg-muted p-1.5 hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -117,7 +117,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                     <LinkedinIcon className="size-3.5" />
                   </a>
                   <a
-                    href="https://leetcode.com/"
+                    href="https://leetcode.com/Adityashah21"
                     target="_blank"
                     rel="noreferrer"
                     className="border border-ink bg-muted p-1.5 hover:bg-accent hover:text-accent-foreground transition-colors"

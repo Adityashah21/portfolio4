@@ -1,6 +1,6 @@
 import React from "react";
 import { Interest } from "../types";
-import { Gamepad2, Zap } from "lucide-react";
+import { Code2, Zap } from "lucide-react";
 
 interface InterestsSectionProps {
   interests: Interest[];
@@ -19,27 +19,26 @@ export const InterestsSection: React.FC<InterestsSectionProps> = ({
         <div className="mb-8 flex items-end gap-4">
           <span className="font-pixel text-[10px] text-accent">ISSUE #04</span>
           <h2 className="comic-title text-5xl text-foreground md:text-6xl">
-            PASSIVE PERKS
+            CORE SPECIALIZATIONS
           </h2>
         </div>
         <p className="mb-10 max-w-xl text-lg leading-8 text-primary-foreground">
-          Beyond the main quest — the interests that make this player, this player.
+          Technical focus areas and engineering principles driving scalable, production-ready software.
         </p>
 
         <div className="mb-8 grid gap-6 sm:grid-cols-2">
           <div className="border-l-4 border-accent pl-6">
-            <Gamepad2 className="mb-3 size-8 text-accent" />
-            <h3 className="font-comic text-4xl">GAMING</h3>
+            <Code2 className="mb-3 size-8 text-accent" />
+            <h3 className="font-comic text-4xl">FULL-STACK ARCHITECTURE</h3>
             <p className="mt-3 max-w-sm leading-7 text-primary-foreground">
-              Another world, another challenge, another reason to press continue.
+              Designing end-to-end MERN applications with modular component hierarchies, RESTful API design, and performant MongoDB schemas.
             </p>
           </div>
           <div className="border-l-4 border-accent pl-6">
             <Zap className="mb-3 size-8 text-accent" />
-            <h3 className="font-comic text-4xl">SPIDER-MAN</h3>
+            <h3 className="font-comic text-4xl">REAL-TIME &amp; EVENT-DRIVEN</h3>
             <p className="mt-3 max-w-sm leading-7 text-primary-foreground">
-              A friendly neighbourhood reminder to keep showing up — even when the
-              next level gets tough.
+              Building bidirectional websocket communication with Socket.IO, session-based JWT authentication, and high-concurrency event loops.
             </p>
           </div>
         </div>

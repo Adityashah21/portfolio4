@@ -33,10 +33,10 @@ export const Hero: React.FC = () => {
               <span className="text-primary">SHAH</span>
             </h1>
             <div className="speech mt-8 max-w-md rounded-sm px-5 py-4 font-comic text-2xl tracking-wide">
-              &quot;With great power comes great responsibility.&quot;
+              &quot;Engineering scalable MERN platforms, real-time architectures &amp; clean code.&quot;
             </div>
             <p className="mt-8 max-w-md text-lg text-muted-foreground">
-              Engineering student @ Greater Noida Institute of Technology — your friendly neighbourhood developer.
+              Full Stack Developer (MERN) &amp; B.Tech CSE Student @ Greater Noida Institute of Technology (&apos;23–&apos;27) — passionate about building high-performance web systems and solving complex algorithmic problems.
             </p>
 
             {/* Action Buttons with Download Resume */}
@@ -65,7 +65,7 @@ export const Hero: React.FC = () => {
                 PLAYER LINKS:
               </span>
               <a
-                href="https://github.com/"
+                href="https://github.com/Adityashah21"
                 target="_blank"
                 rel="noreferrer"
                 className="comic-panel comic-hover flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-foreground hover:text-accent transition-colors"
@@ -75,7 +75,7 @@ export const Hero: React.FC = () => {
                 <span>GitHub</span>
               </a>
               <a
-                href="https://linkedin.com/in/"
+                href="https://linkedin.com/in/aditya-shah-80040232a"
                 target="_blank"
                 rel="noreferrer"
                 className="comic-panel comic-hover flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-foreground hover:text-accent transition-colors"
@@ -85,7 +85,7 @@ export const Hero: React.FC = () => {
                 <span>LinkedIn</span>
               </a>
               <a
-                href="https://leetcode.com/"
+                href="https://leetcode.com/Adityashah21"
                 target="_blank"
                 rel="noreferrer"
                 className="comic-panel comic-hover flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-foreground hover:text-accent transition-colors"

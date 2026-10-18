@@ -1,5 +1,5 @@
 import React from "react";
-import { Gamepad2, FileDown } from "lucide-react";
+import { FileDown, Mail, Code2 } from "lucide-react";
 import { GithubIcon, LinkedinIcon, LeetCodeIcon } from "./icons/SocialIcons";
 
 interface FooterProps {
@@ -10,10 +10,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateAdmin }) => {
   return (
     <footer className="border-t-[3px] border-ink py-12 text-center bg-background">
       <div className="portfolio-shell mx-auto max-w-4xl">
-        {/* Social & Resume Links */}
+        {/* Social, Email & Resume Links */}
         <div className="mb-8 flex flex-wrap items-center justify-center gap-4">
           <a
-            href="https://github.com/"
+            href="https://github.com/Adityashah21"
             target="_blank"
             rel="noreferrer"
             className="comic-panel comic-hover inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-foreground hover:text-accent transition-colors"
@@ -23,7 +23,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateAdmin }) => {
             <span>GitHub</span>
           </a>
           <a
-            href="https://linkedin.com/in/"
+            href="https://linkedin.com/in/aditya-shah-80040232a"
             target="_blank"
             rel="noreferrer"
             className="comic-panel comic-hover inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-foreground hover:text-accent transition-colors"
@@ -33,7 +33,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateAdmin }) => {
             <span>LinkedIn</span>
           </a>
           <a
-            href="https://leetcode.com/"
+            href="https://leetcode.com/Adityashah21"
             target="_blank"
             rel="noreferrer"
             className="comic-panel comic-hover inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-foreground hover:text-accent transition-colors"
@@ -41,6 +41,14 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateAdmin }) => {
           >
             <LeetCodeIcon className="size-4 text-[#FFA116]" />
             <span>LeetCode</span>
+          </a>
+          <a
+            href="mailto:Adityashahofficial22@gmail.com"
+            className="comic-panel comic-hover inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-foreground hover:text-accent transition-colors"
+            title="Email Aditya Shah"
+          >
+            <Mail className="size-4 text-accent" />
+            <span>Email</span>
           </a>
           <a
             href="/resume.pdf"
@@ -55,9 +63,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateAdmin }) => {
           </a>
         </div>
 
-        {/* Arcade ending line */}
+        {/* Professional sign-off line */}
         <p className="font-pixel text-[9px] text-muted-foreground">
-          <Gamepad2 className="mr-2 inline size-4" /> GAME OVER? NAH — TO BE CONTINUED…
+          <Code2 className="mr-2 inline size-4 text-accent" /> ENGINEERED BY ADITYA SHAH · B.TECH CSE &apos;27 · FULL-STACK MERN DEVELOPER
         </p>
 
         {/* Admin Link */}

@@ -7,24 +7,24 @@ export const JourneySection: React.FC = () => {
   const milestones = [
     {
       icon: GraduationCap,
-      label: "MAIN QUEST",
-      title: "Engineering at GNIOT",
-      copy: "Building a foundation at Greater Noida Institute of Technology.",
-      status: "IN PROGRESS",
+      label: "CORE MILESTONE",
+      title: "B.Tech Computer Science (2023 - 2027)",
+      copy: "Greater Noida Institute of Technology — building rigorous foundations in Data Structures, Algorithms, Database Systems, and Object-Oriented Software Design.",
+      status: "IN PROGRESS (B.TECH '27)",
     },
     {
       icon: CodeXml,
-      label: "SIDE QUESTS",
-      title: "Projects & practical learning",
-      copy: "A place for ideas to become working projects, with live links and code to explore.",
-      status: "ONGOING",
+      label: "DEPLOYMENT MILESTONE",
+      title: "Production Web Platforms",
+      copy: "Engineered and deployed scalable MERN web applications including ResCrafted (e-commerce marketplace with 10+ REST APIs) and WarmSpace (real-time Socket.IO wellness platform).",
+      status: "DEPLOYED & ACTIVE",
     },
     {
       icon: Rocket,
-      label: "NEXT CHAPTER",
-      title: "Keep growing",
-      copy: "More skills to learn, more problems to explore, and more achievements to collect.",
-      status: "TO BE CONTINUED",
+      label: "COMPETITIVE RECOGNITION",
+      title: "Hackathons & Certifications",
+      copy: "Rank 7 / 500+ teams in Yukti Startup Hackathon, consecutive internal qualifier in Smart India Hackathon ('24 & '25), and NPTEL Elite Silver in DSA from IIT Kanpur.",
+      status: "ACHIEVED & EXPANDING",
     },
   ];
 
@@ -38,7 +38,7 @@ export const JourneySection: React.FC = () => {
         <SectionHeader
           issue="CAMPAIGN MODE"
           title="THE ENGINEERING ARC"
-          subtitle="Not a finished story. A new level, a new challenge, and something to learn at every stage."
+          subtitle="Milestones in academic rigor, production-grade software development, and competitive hackathons."
         />
 
         <div className="grid gap-12 lg:grid-cols-[1fr_1.15fr]">
@@ -52,9 +52,7 @@ export const JourneySection: React.FC = () => {
               LEVEL UP. REPEAT.
             </h3>
             <p className="mt-5 max-w-md leading-7 text-muted-foreground">
-              Engineering is the main quest. Projects and new skills are the
-              checkpoints. This portfolio keeps those pieces together as the
-              journey grows.
+              Driven by architectural excellence and algorithmic problem-solving. Each milestone represents deployed full-stack products, validated credentials, and continuous learning.
             </p>
             <Button asChild variant="comicBlue" className="mt-7">
               <a href="#skills">
