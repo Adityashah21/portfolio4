@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { PortfolioData } from "./types";
-import { fetchPortfolioData, initialPortfolioData } from "./lib/supabase";
+import { fetchPortfolioData, initialPortfolioData } from "./lib/api";
 import { Portfolio } from "./pages/Portfolio";
 import { Admin } from "./pages/Admin";
 import { Toaster } from "sonner";

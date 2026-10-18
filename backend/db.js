@@ -1,0 +1,143 @@
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const dataDir = path.join(__dirname, "data");
+const dbPath = path.join(dataDir, "db.json");
+export const uploadsDir = path.join(__dirname, "uploads");
+
+// Ensure data and uploads directories exist
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+export const initialData = {
+  users: [],
+  projects: [
+    {
+      id: "2553b44e-b258-4ffb-9f22-f1305546c35d",
+      title: "Web-Slinger Portfolio",
+      description: "This very site — a comic + gaming styled portfolio with its own admin panel.",
+      tech: ["React", "TypeScript", "Tailwind"],
+      live_url: null,
+      repo_url: null,
+      image_url: null,
+      sort_order: 1,
+      created_at: "2026-10-18T15:38:36.782834+00:00",
+    },
+  ],
+  skills: [
+    {
+      id: "3a869f02-1e9b-43f5-88c3-a734546d4606",
+      name: "JavaScript",
+      category: "Code",
+      level: 80,
+      sort_order: 1,
+      created_at: "2026-10-18T15:38:36.782834+00:00",
+    },
+    {
+      id: "c93c6e26-6b58-4a25-9ef6-1f628cd61cc5",
+      name: "React",
+      category: "Code",
+      level: 75,
+      sort_order: 2,
+      created_at: "2026-10-18T15:38:36.782834+00:00",
+    },
+    {
+      id: "10689962-10dd-47e3-8952-2411e8451925",
+      name: "Python",
+      category: "Code",
+      level: 70,
+      sort_order: 3,
+      created_at: "2026-10-18T15:38:36.782834+00:00",
+    },
+    {
+      id: "21684b76-d839-4f0d-b613-3b3809b7959b",
+      name: "C / C++",
+      category: "Code",
+      level: 65,
+      sort_order: 4,
+      created_at: "2026-10-18T15:38:36.782834+00:00",
+    },
+    {
+      id: "6c717b78-cb9f-4dcc-a8bc-47d71622f3e0",
+      name: "Git & GitHub",
+      category: "Tools",
+      level: 70,
+      sort_order: 5,
+      created_at: "2026-10-18T15:38:36.782834+00:00",
+    },
+  ],
+  certifications: [
+    {
+      id: "e490991a-bb73-4caa-a2e4-59187486d83e",
+      title: "Sample Certificate — replace me",
+      issuer: "Issuer name",
+      issued_on: "2026",
+      credential_url: null,
+      image_url: null,
+      sort_order: 1,
+      created_at: "2026-10-18T15:38:36.782834+00:00",
+    },
+  ],
+  interests: [
+    {
+      id: "a34a377e-964a-48a0-a367-9fa9e3a6804d",
+      name: "Gaming",
+      emoji: "🎮",
+      sort_order: 1,
+      created_at: "2026-10-18T15:38:36.782834+00:00",
+    },
+    {
+      id: "0d3ff63b-780a-4f40-919c-5c7fc1048b53",
+      name: "Comics",
+      emoji: "🕷️",
+      sort_order: 2,
+      created_at: "2026-10-18T15:38:36.782834+00:00",
+    },
+    {
+      id: "4f711877-e96d-4cb5-893d-4c4ff304389a",
+      name: "Web Dev",
+      emoji: "💻",
+      sort_order: 3,
+      created_at: "2026-10-18T15:38:36.782834+00:00",
+    },
+    {
+      id: "d8f4b9e5-291b-404f-87d8-2aa8bec478c1",
+      name: "Problem Solving",
+      emoji: "🧩",
+      sort_order: 4,
+      created_at: "2026-10-18T15:38:36.782834+00:00",
+    },
+  ],
+};
+
+export function readDb() {
+  if (!fs.existsSync(dbPath)) {
+    fs.writeFileSync(dbPath, JSON.stringify(initialData, null, 2), "utf8");
+    return initialData;
+  }
+  try {
+    const raw = fs.readFileSync(dbPath, "utf8");
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error("Error reading database file:", err);
+    return initialData;
+  }
+}
+
+export function writeDb(data) {
+  try {
+    fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), "utf8");
+    return true;
+  } catch (err) {
+    console.error("Error writing database file:", err);
+    return false;
+  }
+}

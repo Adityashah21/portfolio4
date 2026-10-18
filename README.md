@@ -1,74 +1,80 @@
 # Web-Slinger Questfolio 🕸️🎮
 
-A comic-book & arcade video game styled developer portfolio for **Aditya Shah — Friendly Neighbourhood Engineer**, inspired by Spider-Man and retro gaming aesthetics.
-
-Built with **React**, **TypeScript**, **Tailwind CSS**, and **Supabase**.
+A comic-book & retro gaming styled portfolio for **Aditya Shah — Friendly Neighbourhood Engineer**, complete with a dedicated **Backend API** and **Frontend Web Application**.
 
 ---
 
-## 🚀 Features
+## 📁 Repository Structure
 
-- **Comic & Retro Aesthetic**:
-  - Bangers & Press Start 2P typography
-  - Halftone dot texture overlays
-  - Bold ink borders (`border-ink`) & hard-drop comic shadows (`var(--shadow-comic)`)
-  - Glitch animations & glowing hero overlay
-  - Yellow comic speech bubbles
-- **Gamified Elements**:
-  - Live XP Level Calculation in top navigation (`XP 360`)
-  - RPG Skill Tree with dynamic tier labeling (`LEGENDARY`, `EPIC`, `RARE`, `COMMON`) and animated XP fill bars
-  - Quest Completed cards with issue badge and tech tags
-  - Achievement Loot unlocks with badges
-  - Passive Perks badges
-- **Control Room Admin Dashboard (`/admin`)**:
-  - Arcade-style authentication: "INSERT COIN TO CONTINUE" / "CREATE PLAYER"
-  - Manage all 4 database collections live:
-    - **Projects** (Title, Description, Tech list, Live link, GitHub link, Image)
-    - **Skills** (Skill name, Category, Level 0-100)
-    - **Certifications** (Title, Issuer, Date, Credential link, Image)
-    - **Interests** (Interest name, Emoji)
-  - Add and delete records with instant UI updates and toast notifications.
-  - Built-in resilient local storage caching & fallback so it works instantly out-of-the-box offline and online.
-
----
-
-## 🛠️ Tech Stack
-
-- **Framework**: React 18 + Vite + TypeScript
-- **Styling**: Tailwind CSS + Custom CSS Variables & Animations
-- **Icons**: Lucide React
-- **Notifications**: Sonner
-- **Backend / Database**: Supabase Client (`@supabase/supabase-js`)
-
----
-
-## 💻 Getting Started
-
-### 1. Install Dependencies
-```bash
-npm install
+```
+portfolio/
+├── backend/                  # Node.js + Express API server
+│   ├── data/
+│   │   └── db.json           # Persistent database
+│   ├── middleware/
+│   │   └── auth.js           # JWT verification middleware
+│   ├── uploads/              # Uploaded certificates & project images
+│   ├── .env                  # Backend port & JWT secret
+│   ├── db.js                 # DB read/write helper & seed data
+│   ├── package.json
+│   └── server.js             # API server & routes
+├── frontend/                 # React 18 + Vite + Tailwind CSS SPA
+│   ├── public/
+│   │   ├── favicon.ico
+│   │   └── hero.jpg
+│   ├── src/
+│   │   ├── components/       # Quests, Skill Tree, Loot & Perks UI
+│   │   ├── lib/
+│   │   │   ├── api.ts        # Backend API client with file uploads
+│   │   │   └── utils.ts
+│   │   ├── pages/
+│   │   │   ├── Admin.tsx     # Control Room admin panel
+│   │   │   └── Portfolio.tsx # Main portfolio page
+│   │   ├── App.tsx
+│   │   ├── index.css
+│   │   └── main.tsx
+│   ├── package.json
+│   └── vite.config.ts        # Configured with proxy to backend (/api & /uploads)
+├── package.json              # Root orchestration scripts
+└── README.md
 ```
 
-### 2. Run Development Server
-```bash
+---
+
+## ⚡ Quick Start
+
+### 1. Start the Backend Server
+In one terminal:
+```powershell
+cd backend
 npm run dev
 ```
-Open `http://localhost:5173` in your browser.
+The backend starts on `http://localhost:5000`.
 
-### 3. Build for Production
-```bash
-npm run build
+### 2. Start the Frontend Application
+In a second terminal:
+```powershell
+cd frontend
+npm run dev
 ```
+The frontend starts on `http://localhost:5173`.
 
 ---
 
-## 🔑 Supabase Configuration (Optional)
+## 🛡️ Admin & Control Room Features (`/admin`)
 
-To connect your own Supabase instance:
-Create a `.env` file in the root directory:
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
-```
+1. **Authentication**:
+   - Navigate to `http://localhost:5173/admin` (or click `ADMIN` in the footer).
+   - Click *"First time? Create the admin account"* to register. The very first registered user automatically becomes the **Admin**.
+   - Subsequent logins use the same email and password.
+   - JWT tokens are securely verified for all mutations.
 
-If no environment variables are provided, the portfolio seamlessly defaults to the bundled initial dataset with local persistence!
+2. **File Uploads for Certificates & Projects**:
+   - When adding a **Certification**, click **UPLOAD FILE** to upload image or PDF certificates directly.
+   - Files are stored in `backend/uploads/` and served via `/uploads/...`.
+   - Projects also support direct file upload for preview images.
+
+3. **Dynamic Skill Tree & Projects Management**:
+   - Add new skills with category and level (0–100). The frontend automatically assigns RPG tiers (`LEGENDARY`, `EPIC`, `RARE`, `COMMON`) and updates the live XP counter.
+   - Add completed quests/projects with tech stacks and live/code links.
+   - Delete any entry with the comic trash icon.

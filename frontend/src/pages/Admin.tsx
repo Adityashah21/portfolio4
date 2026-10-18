@@ -3,9 +3,17 @@ import { PortfolioData } from "../types";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
-import { supabase, addItem, deleteItem } from "../lib/supabase";
+import {
+  login,
+  register,
+  getStoredUser,
+  clearAuthSession,
+  addItem,
+  deleteItem,
+  uploadFile,
+} from "../lib/api";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { Trash2, Upload, CheckCircle2 } from "lucide-react";
 
 interface AdminProps {
   data: PortfolioData;
@@ -18,7 +26,7 @@ interface TableConfig {
   fields: {
     key: string;
     label: string;
-    type?: "textarea" | "number" | "list" | "text";
+    type?: "textarea" | "number" | "list" | "text" | "file";
   }[];
   display: (item: any) => string;
 }
@@ -32,7 +40,7 @@ const tableConfigs: Record<keyof PortfolioData, TableConfig> = {
       { key: "tech", label: "Tech (comma separated)", type: "list" },
       { key: "live_url", label: "Live link" },
       { key: "repo_url", label: "GitHub link" },
-      { key: "image_url", label: "Image URL (optional)" },
+      { key: "image_url", label: "Project Image (Upload or URL)" },
     ],
     display: (item) => String(item.title),
   },
@@ -52,7 +60,7 @@ const tableConfigs: Record<keyof PortfolioData, TableConfig> = {
       { key: "issuer", label: "Issuer" },
       { key: "issued_on", label: "Date (e.g. Mar 2026)" },
       { key: "credential_url", label: "Credential link" },
-      { key: "image_url", label: "Certificate image URL (optional)" },
+      { key: "image_url", label: "Certificate Image / Document (Upload or URL)" },
     ],
     display: (item) => `${item.title} — ${item.issuer}`,
   },
@@ -71,7 +79,7 @@ export const Admin: React.FC<AdminProps> = ({
   onRefresh,
   onNavigateHome,
 }) => {
-  const [session, setSession] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [isReady, setIsReady] = useState(false);
   const [authMode, setAuthMode] = useState<"in" | "up">("in");
   const [email, setEmail] = useState("");
@@ -79,36 +87,14 @@ export const Admin: React.FC<AdminProps> = ({
   const [authLoading, setAuthLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<keyof PortfolioData>("projects");
   const [formData, setFormData] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    // Check local admin mock session first
-    const mockAdmin = localStorage.getItem("questfolio_admin_session");
-    if (mockAdmin) {
-      setSession(JSON.parse(mockAdmin));
-      setIsReady(true);
-      return;
+    const user = getStoredUser();
+    if (user) {
+      setCurrentUser(user);
     }
-
-    try {
-      supabase.auth.getSession().then(({ data: sessData }) => {
-        if (sessData.session) {
-          setSession(sessData.session);
-        }
-        setIsReady(true);
-      });
-
-      const { data: subData } = supabase.auth.onAuthStateChange(
-        (_event, newSess) => {
-          setSession(newSess);
-        }
-      );
-
-      return () => {
-        subData.subscription.unsubscribe();
-      };
-    } catch {
-      setIsReady(true);
-    }
+    setIsReady(true);
   }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -116,60 +102,42 @@ export const Admin: React.FC<AdminProps> = ({
     setAuthLoading(true);
 
     try {
-      const res =
-        authMode === "in"
-          ? await supabase.auth.signInWithPassword({ email, password })
-          : await supabase.auth.signUp({
-              email,
-              password,
-              options: {
-                emailRedirectTo: `${window.location.origin}/admin`,
-              },
-            });
-
-      if (res.error) {
-        // Fallback to local admin login for demo / standalone use
-        const fallbackSession = {
-          user: { id: "local-admin", email },
-        };
-        localStorage.setItem(
-          "questfolio_admin_session",
-          JSON.stringify(fallbackSession)
-        );
-        setSession(fallbackSession);
-        toast.success("Welcome, web-head! Logged in as Admin.");
+      if (authMode === "in") {
+        const res = await login(email, password);
+        setCurrentUser(res.user);
+        toast.success("Welcome back, Commander!");
       } else {
-        if (authMode === "up" && !res.data.session) {
-          toast.success("Check your email to confirm, then log in.");
-        } else if (res.data.session) {
-          setSession(res.data.session);
-          toast.success("Welcome back, Commander!");
-        }
+        const res = await register(email, password);
+        setCurrentUser(res.user);
+        toast.success("Player created! Admin privileges granted.");
       }
-    } catch {
-      const fallbackSession = {
-        user: { id: "local-admin", email },
-      };
-      localStorage.setItem(
-        "questfolio_admin_session",
-        JSON.stringify(fallbackSession)
-      );
-      setSession(fallbackSession);
-      toast.success("Logged in as Admin.");
+    } catch (err: any) {
+      toast.error(err.message || "Authentication failed");
     } finally {
       setAuthLoading(false);
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch {
-      // ignore
-    }
-    localStorage.removeItem("questfolio_admin_session");
-    setSession(null);
+  const handleSignOut = () => {
+    clearAuthSession();
+    setCurrentUser(null);
     toast.info("Logged out.");
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, key: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const res = await uploadFile(file);
+      setFormData((prev) => ({ ...prev, [key]: res.url }));
+      toast.success(`Uploaded: ${file.name}`);
+    } catch (err: any) {
+      toast.error(err.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleAddItem = async (e: React.FormEvent) => {
@@ -193,16 +161,24 @@ export const Admin: React.FC<AdminProps> = ({
       }
     }
 
-    await addItem(activeTab, payload);
-    toast.success("Added!");
-    setFormData({});
-    onRefresh();
+    try {
+      await addItem(activeTab, payload);
+      toast.success("Added successfully!");
+      setFormData({});
+      onRefresh();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to add item");
+    }
   };
 
   const handleDeleteItem = async (id: string) => {
-    await deleteItem(activeTab, id);
-    toast.success("Deleted!");
-    onRefresh();
+    try {
+      await deleteItem(activeTab, id);
+      toast.success("Deleted!");
+      onRefresh();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete");
+    }
   };
 
   if (!isReady) return null;
@@ -219,7 +195,7 @@ export const Admin: React.FC<AdminProps> = ({
           >
             View site
           </Button>
-          {session && (
+          {currentUser && (
             <Button
               variant="comicYellow"
               size="sm"
@@ -231,7 +207,7 @@ export const Admin: React.FC<AdminProps> = ({
         </div>
       </div>
 
-      {!session ? (
+      {!currentUser ? (
         <form
           onSubmit={handleAuth}
           className="comic-panel mx-auto max-w-sm space-y-4 p-6"
@@ -301,20 +277,65 @@ export const Admin: React.FC<AdminProps> = ({
               <p className="font-pixel text-[10px] text-accent">
                 ADD {tableConfigs[activeTab].title.toUpperCase()}
               </p>
-              {tableConfigs[activeTab].fields.map((field) =>
-                field.type === "textarea" ? (
-                  <Textarea
-                    key={field.key}
-                    placeholder={field.label}
-                    value={formData[field.key] ?? ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        [field.key]: e.target.value,
-                      })
-                    }
-                  />
-                ) : (
+              {tableConfigs[activeTab].fields.map((field) => {
+                if (field.type === "textarea") {
+                  return (
+                    <Textarea
+                      key={field.key}
+                      placeholder={field.label}
+                      value={formData[field.key] ?? ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          [field.key]: e.target.value,
+                        })
+                      }
+                    />
+                  );
+                }
+
+                if (field.key === "image_url") {
+                  return (
+                    <div key={field.key} className="space-y-1.5">
+                      <Input
+                        type="text"
+                        placeholder={field.label}
+                        value={formData[field.key] ?? ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            [field.key]: e.target.value,
+                          })
+                        }
+                      />
+                      <div className="flex items-center justify-between text-xs px-1">
+                        <label className="inline-flex items-center gap-1.5 cursor-pointer font-pixel text-[9px] text-accent hover:underline">
+                          <Upload className="size-3.5" />
+                          <span>UPLOAD FILE</span>
+                          <input
+                            type="file"
+                            accept="image/*,.pdf"
+                            className="hidden"
+                            disabled={uploading}
+                            onChange={(e) => handleFileUpload(e, field.key)}
+                          />
+                        </label>
+                        {uploading && (
+                          <span className="font-pixel text-[8px] text-xp animate-pulse">
+                            UPLOADING...
+                          </span>
+                        )}
+                        {formData[field.key] && !uploading && (
+                          <span className="inline-flex items-center gap-1 font-pixel text-[8px] text-xp">
+                            <CheckCircle2 className="size-3" /> ATTACHED
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
                   <Input
                     key={field.key}
                     type={field.type === "number" ? "number" : "text"}
@@ -328,8 +349,8 @@ export const Admin: React.FC<AdminProps> = ({
                       })
                     }
                   />
-                )
-              )}
+                );
+              })}
               <Button type="submit" variant="comic" className="w-full">
                 Add
               </Button>
