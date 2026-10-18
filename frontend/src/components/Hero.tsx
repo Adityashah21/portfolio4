@@ -98,10 +98,10 @@ export const Hero: React.FC = () => {
           </div>
 
           {/* Right Column: Comic Avatar (Opposite the Name) */}
-          <div className="relative mx-auto lg:mr-4 shrink-0 flex items-center justify-center">
-            {/* Comic LEVEL UP Burst sticker */}
+          <div className="relative mx-auto lg:mr-2 shrink-0 flex items-center justify-center mt-6 lg:mt-0">
+            {/* Comic LEVEL UP Burst sticker - placed at top-left outside the frame so it does not overlap */}
             <span
-              className="hero-burst hidden lg:flex !static lg:!absolute -top-8 -right-6 z-20"
+              className="hero-burst hidden lg:flex -top-8 -left-8 z-20"
               aria-hidden="true"
             >
               LEVEL
@@ -109,16 +109,16 @@ export const Hero: React.FC = () => {
               UP!
             </span>
 
-            {/* Avatar Frame with comic border, shadow and halftone texture */}
+            {/* Avatar Frame with comic border, shadow and halftone texture - enlarged size */}
             <div className="relative group">
-              <div className="relative size-64 sm:size-72 md:size-80 lg:size-88 rounded-2xl border-[3px] border-ink bg-card/85 p-3 shadow-[var(--shadow-comic-lg)] halftone overflow-hidden flex items-end justify-center">
+              <div className="relative w-72 h-[340px] sm:w-80 sm:h-[380px] md:w-96 md:h-[440px] lg:w-[420px] lg:h-[480px] rounded-2xl border-[3px] border-ink bg-card/85 p-3 shadow-[var(--shadow-comic-lg)] halftone overflow-hidden flex items-end justify-center">
                 <img
                   src="/avatar.png"
                   alt="Aditya Shah - Comic Avatar"
                   className="h-full w-full object-contain filter drop-shadow-[0_12px_18px_rgba(0,0,0,0.7)] group-hover:scale-105 transition-transform duration-300"
                 />
                 {/* Comic Nameplate Tag */}
-                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap border-2 border-ink bg-accent px-3 py-0.5 font-pixel text-[9px] text-accent-foreground shadow-[var(--shadow-comic)] uppercase">
+                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap border-2 border-ink bg-accent px-3 py-1 font-pixel text-[9px] text-accent-foreground shadow-[var(--shadow-comic)] uppercase">
                   PLAYER 1 · ADITYA
                 </span>
               </div>

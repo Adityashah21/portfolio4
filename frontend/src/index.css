@@ -158,8 +158,8 @@ body {
 /* Hero burst explosion */
 .hero-burst {
   text-align: center;
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   font-family: var(--font-comic);
   color: var(--accent-foreground);
   background: var(--accent);
@@ -170,12 +170,10 @@ body {
   );
   justify-content: center;
   align-items: center;
-  font-size: 42px;
+  font-size: 32px;
   line-height: 1;
   animation: 5s ease-in-out infinite burst-rock;
   position: absolute;
-  top: 22%;
-  right: 8%;
 }
 
 @keyframes burst-rock {
