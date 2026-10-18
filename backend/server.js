@@ -2,14 +2,22 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
+import fs from "fs";
 import crypto from "crypto";
 import multer from "multer";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { readDb, writeDb, uploadsDir } from "./db.js";
 import { authMiddleware, JWT_SECRET } from "./middleware/auth.js";
+import { connectMongo, isMongoConnected } from "./mongo.js";
+import { initCloudinary, isCloudinaryConfigured, uploadToCloudinary } from "./cloudinary.js";
+import { User, Project, Skill, Certification, Interest } from "./models/index.js";
 
 dotenv.config();
+
+// Initialize Cloud Services if configured in environment variables
+initCloudinary();
+connectMongo();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,26 +27,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files statically
+// Serve local uploaded files statically (fallback)
 app.use("/uploads", express.static(uploadsDir));
 
-// Multer Storage Configuration
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const sanitizedBase = path
-      .basename(file.originalname, ext)
-      .replace(/[^a-zA-Z0-9_-]/g, "_");
-    const uniqueSuffix = Date.now() + "_" + Math.round(Math.random() * 1e6);
-    cb(null, `${sanitizedBase}_${uniqueSuffix}${ext}`);
-  },
-});
-
+// Memory storage multer to support both Cloudinary cloud streaming and local disk fallback
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 15 * 1024 * 1024 }, // 15MB limit
 });
 
@@ -52,22 +46,55 @@ app.post("/api/auth/register", async (req, res) => {
       return res.status(400).json({ error: "Email and password are required." });
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const userId = crypto.randomUUID();
+
+    if (isMongoConnected()) {
+      const existingUser = await User.findOne({ email: normalizedEmail });
+      if (existingUser) {
+        return res.status(400).json({ error: "User already exists." });
+      }
+
+      const totalUsers = await User.countDocuments();
+      const role = totalUsers === 0 ? "admin" : "user";
+
+      const newUser = await User.create({
+        id: userId,
+        email: normalizedEmail,
+        password: hashedPassword,
+        role,
+        created_at: new Date().toISOString(),
+      });
+
+      const token = jwt.sign(
+        { id: newUser.id, email: newUser.email, role: newUser.role },
+        JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      return res.status(201).json({
+        message: "User registered successfully.",
+        token,
+        user: { id: newUser.id, email: newUser.email, role: newUser.role },
+      });
+    }
+
+    // Fallback: Local JSON database
     const db = readDb();
     const existingUser = db.users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
+      (u) => u.email.toLowerCase() === normalizedEmail
     );
     if (existingUser) {
       return res.status(400).json({ error: "User already exists." });
     }
 
-    // First user registered becomes the admin
     const isFirstUser = db.users.length === 0;
     const role = isFirstUser ? "admin" : "user";
 
-    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
-      id: crypto.randomUUID(),
-      email,
+      id: userId,
+      email: normalizedEmail,
       password: hashedPassword,
       role,
       created_at: new Date().toISOString(),
@@ -101,10 +128,16 @@ app.post("/api/auth/login", async (req, res) => {
       return res.status(400).json({ error: "Email and password are required." });
     }
 
-    const db = readDb();
-    const user = db.users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
-    );
+    const normalizedEmail = email.toLowerCase().trim();
+    let user = null;
+
+    if (isMongoConnected()) {
+      user = await User.findOne({ email: normalizedEmail });
+    } else {
+      const db = readDb();
+      user = db.users.find((u) => u.email.toLowerCase() === normalizedEmail);
+    }
+
     if (!user) {
       return res.status(400).json({ error: "Invalid email or password." });
     }
@@ -145,62 +178,117 @@ app.get("/api/auth/me", authMiddleware, (req, res) => {
 // ---------------- PORTFOLIO ROUTES ---------------- //
 
 // Get all portfolio data
-app.get("/api/portfolio", (_req, res) => {
-  const db = readDb();
-  const sortFn = (a, b) =>
-    (a.sort_order || 0) - (b.sort_order || 0) ||
-    new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+app.get("/api/portfolio", async (_req, res) => {
+  try {
+    if (isMongoConnected()) {
+      const [projects, skills, certifications, interests] = await Promise.all([
+        Project.find().sort({ sort_order: 1, created_at: 1 }).lean(),
+        Skill.find().sort({ sort_order: 1, created_at: 1 }).lean(),
+        Certification.find().sort({ sort_order: 1, created_at: 1 }).lean(),
+        Interest.find().sort({ sort_order: 1, created_at: 1 }).lean(),
+      ]);
 
-  return res.json({
-    projects: [...db.projects].sort(sortFn),
-    skills: [...db.skills].sort(sortFn),
-    certifications: [...db.certifications].sort(sortFn),
-    interests: [...db.interests].sort(sortFn),
-  });
+      return res.json({ projects, skills, certifications, interests });
+    }
+
+    // Fallback: Local JSON database
+    const db = readDb();
+    const sortFn = (a, b) =>
+      (a.sort_order || 0) - (b.sort_order || 0) ||
+      new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+
+    return res.json({
+      projects: [...db.projects].sort(sortFn),
+      skills: [...db.skills].sort(sortFn),
+      certifications: [...db.certifications].sort(sortFn),
+      interests: [...db.interests].sort(sortFn),
+    });
+  } catch (err) {
+    console.error("Get portfolio error:", err);
+    return res.status(500).json({ error: "Failed to fetch portfolio data." });
+  }
 });
 
-// Upload File (Certificates / Project Images)
-app.post("/api/upload", authMiddleware, upload.single("file"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file was uploaded." });
-  }
+// Upload File (Certificates / Project Images -> Cloudinary or local disk fallback)
+app.post("/api/upload", authMiddleware, upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file was uploaded." });
+    }
 
-  const fileUrl = `/uploads/${req.file.filename}`;
-  return res.json({
-    url: fileUrl,
-    filename: req.file.filename,
-    originalName: req.file.originalname,
-    size: req.file.size,
-    mimetype: req.file.mimetype,
-  });
+    // 1. If Cloudinary is configured, upload directly to the cloud CDN
+    if (isCloudinaryConfigured()) {
+      const result = await uploadToCloudinary(req.file.buffer, req.file.originalname);
+      return res.json({
+        url: result.secure_url,
+        filename: result.public_id,
+        originalName: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype,
+        provider: "cloudinary",
+      });
+    }
+
+    // 2. Fallback: Save to local uploads directory
+    const ext = path.extname(req.file.originalname);
+    const sanitizedBase = path
+      .basename(req.file.originalname, ext)
+      .replace(/[^a-zA-Z0-9_-]/g, "_");
+    const uniqueSuffix = Date.now() + "_" + Math.round(Math.random() * 1e6);
+    const filename = `${sanitizedBase}_${uniqueSuffix}${ext}`;
+    const destinationPath = path.join(uploadsDir, filename);
+
+    await fs.promises.writeFile(destinationPath, req.file.buffer);
+
+    return res.json({
+      url: `/uploads/${filename}`,
+      filename,
+      originalName: req.file.originalname,
+      size: req.file.size,
+      mimetype: req.file.mimetype,
+      provider: "local",
+    });
+  } catch (err) {
+    console.error("Upload error:", err);
+    return res.status(500).json({ error: "File upload failed: " + err.message });
+  }
 });
 
 // ---------------- PROJECTS CRUD ---------------- //
 
-app.post("/api/projects", authMiddleware, (req, res) => {
+app.post("/api/projects", authMiddleware, async (req, res) => {
   try {
     const { title, description, tech, live_url, repo_url, image_url } = req.body;
     if (!title) {
       return res.status(400).json({ error: "Title is required." });
     }
 
-    const db = readDb();
+    const techArray = Array.isArray(tech)
+      ? tech
+      : typeof tech === "string"
+      ? tech.split(",").map((s) => s.trim()).filter(Boolean)
+      : [];
+
     const newProject = {
       id: crypto.randomUUID(),
       title,
       description: description || "",
-      tech: Array.isArray(tech)
-        ? tech
-        : typeof tech === "string"
-        ? tech.split(",").map((s) => s.trim()).filter(Boolean)
-        : [],
+      tech: techArray,
       live_url: live_url || null,
       repo_url: repo_url || null,
       image_url: image_url || null,
-      sort_order: db.projects.length + 1,
       created_at: new Date().toISOString(),
     };
 
+    if (isMongoConnected()) {
+      const count = await Project.countDocuments();
+      newProject.sort_order = count + 1;
+      const created = await Project.create(newProject);
+      return res.status(201).json(created);
+    }
+
+    const db = readDb();
+    newProject.sort_order = db.projects.length + 1;
     db.projects.push(newProject);
     writeDb(db);
     return res.status(201).json(newProject);
@@ -210,37 +298,57 @@ app.post("/api/projects", authMiddleware, (req, res) => {
   }
 });
 
-app.delete("/api/projects/:id", authMiddleware, (req, res) => {
-  const db = readDb();
-  const initialLength = db.projects.length;
-  db.projects = db.projects.filter((p) => String(p.id) !== String(req.params.id));
-  if (db.projects.length === initialLength) {
-    return res.status(404).json({ error: "Project not found." });
+app.delete("/api/projects/:id", authMiddleware, async (req, res) => {
+  try {
+    if (isMongoConnected()) {
+      const deleted = await Project.findOneAndDelete({ id: req.params.id });
+      if (!deleted) {
+        return res.status(404).json({ error: "Project not found." });
+      }
+      return res.json({ message: "Project deleted successfully." });
+    }
+
+    const db = readDb();
+    const initialLength = db.projects.length;
+    db.projects = db.projects.filter((p) => String(p.id) !== String(req.params.id));
+    if (db.projects.length === initialLength) {
+      return res.status(404).json({ error: "Project not found." });
+    }
+    writeDb(db);
+    return res.json({ message: "Project deleted successfully." });
+  } catch (err) {
+    console.error("Delete project error:", err);
+    return res.status(500).json({ error: "Failed to delete project." });
   }
-  writeDb(db);
-  return res.json({ message: "Project deleted successfully." });
 });
 
 // ---------------- SKILLS CRUD ---------------- //
 
-app.post("/api/skills", authMiddleware, (req, res) => {
+app.post("/api/skills", authMiddleware, async (req, res) => {
   try {
     const { name, category, level } = req.body;
     if (!name) {
       return res.status(400).json({ error: "Skill name is required." });
     }
 
-    const db = readDb();
     const parsedLevel = Math.max(0, Math.min(100, Number(level) || 0));
     const newSkill = {
       id: crypto.randomUUID(),
       name,
       category: category || "Code",
       level: parsedLevel,
-      sort_order: db.skills.length + 1,
       created_at: new Date().toISOString(),
     };
 
+    if (isMongoConnected()) {
+      const count = await Skill.countDocuments();
+      newSkill.sort_order = count + 1;
+      const created = await Skill.create(newSkill);
+      return res.status(201).json(created);
+    }
+
+    const db = readDb();
+    newSkill.sort_order = db.skills.length + 1;
     db.skills.push(newSkill);
     writeDb(db);
     return res.status(201).json(newSkill);
@@ -250,27 +358,39 @@ app.post("/api/skills", authMiddleware, (req, res) => {
   }
 });
 
-app.delete("/api/skills/:id", authMiddleware, (req, res) => {
-  const db = readDb();
-  const initialLength = db.skills.length;
-  db.skills = db.skills.filter((s) => String(s.id) !== String(req.params.id));
-  if (db.skills.length === initialLength) {
-    return res.status(404).json({ error: "Skill not found." });
+app.delete("/api/skills/:id", authMiddleware, async (req, res) => {
+  try {
+    if (isMongoConnected()) {
+      const deleted = await Skill.findOneAndDelete({ id: req.params.id });
+      if (!deleted) {
+        return res.status(404).json({ error: "Skill not found." });
+      }
+      return res.json({ message: "Skill deleted successfully." });
+    }
+
+    const db = readDb();
+    const initialLength = db.skills.length;
+    db.skills = db.skills.filter((s) => String(s.id) !== String(req.params.id));
+    if (db.skills.length === initialLength) {
+      return res.status(404).json({ error: "Skill not found." });
+    }
+    writeDb(db);
+    return res.json({ message: "Skill deleted successfully." });
+  } catch (err) {
+    console.error("Delete skill error:", err);
+    return res.status(500).json({ error: "Failed to delete skill." });
   }
-  writeDb(db);
-  return res.json({ message: "Skill deleted successfully." });
 });
 
 // ---------------- CERTIFICATIONS CRUD ---------------- //
 
-app.post("/api/certifications", authMiddleware, (req, res) => {
+app.post("/api/certifications", authMiddleware, async (req, res) => {
   try {
     const { title, issuer, issued_on, credential_url, image_url } = req.body;
     if (!title) {
       return res.status(400).json({ error: "Title is required." });
     }
 
-    const db = readDb();
     const newCert = {
       id: crypto.randomUUID(),
       title,
@@ -278,10 +398,18 @@ app.post("/api/certifications", authMiddleware, (req, res) => {
       issued_on: issued_on || null,
       credential_url: credential_url || null,
       image_url: image_url || null,
-      sort_order: db.certifications.length + 1,
       created_at: new Date().toISOString(),
     };
 
+    if (isMongoConnected()) {
+      const count = await Certification.countDocuments();
+      newCert.sort_order = count + 1;
+      const created = await Certification.create(newCert);
+      return res.status(201).json(created);
+    }
+
+    const db = readDb();
+    newCert.sort_order = db.certifications.length + 1;
     db.certifications.push(newCert);
     writeDb(db);
     return res.status(201).json(newCert);
@@ -291,37 +419,57 @@ app.post("/api/certifications", authMiddleware, (req, res) => {
   }
 });
 
-app.delete("/api/certifications/:id", authMiddleware, (req, res) => {
-  const db = readDb();
-  const initialLength = db.certifications.length;
-  db.certifications = db.certifications.filter(
-    (c) => String(c.id) !== String(req.params.id)
-  );
-  if (db.certifications.length === initialLength) {
-    return res.status(404).json({ error: "Certification not found." });
+app.delete("/api/certifications/:id", authMiddleware, async (req, res) => {
+  try {
+    if (isMongoConnected()) {
+      const deleted = await Certification.findOneAndDelete({ id: req.params.id });
+      if (!deleted) {
+        return res.status(404).json({ error: "Certification not found." });
+      }
+      return res.json({ message: "Certification deleted successfully." });
+    }
+
+    const db = readDb();
+    const initialLength = db.certifications.length;
+    db.certifications = db.certifications.filter(
+      (c) => String(c.id) !== String(req.params.id)
+    );
+    if (db.certifications.length === initialLength) {
+      return res.status(404).json({ error: "Certification not found." });
+    }
+    writeDb(db);
+    return res.json({ message: "Certification deleted successfully." });
+  } catch (err) {
+    console.error("Delete certification error:", err);
+    return res.status(500).json({ error: "Failed to delete certification." });
   }
-  writeDb(db);
-  return res.json({ message: "Certification deleted successfully." });
 });
 
 // ---------------- INTERESTS CRUD ---------------- //
 
-app.post("/api/interests", authMiddleware, (req, res) => {
+app.post("/api/interests", authMiddleware, async (req, res) => {
   try {
     const { name, emoji } = req.body;
     if (!name) {
       return res.status(400).json({ error: "Name is required." });
     }
 
-    const db = readDb();
     const newInterest = {
       id: crypto.randomUUID(),
       name,
       emoji: emoji || "✨",
-      sort_order: db.interests.length + 1,
       created_at: new Date().toISOString(),
     };
 
+    if (isMongoConnected()) {
+      const count = await Interest.countDocuments();
+      newInterest.sort_order = count + 1;
+      const created = await Interest.create(newInterest);
+      return res.status(201).json(created);
+    }
+
+    const db = readDb();
+    newInterest.sort_order = db.interests.length + 1;
     db.interests.push(newInterest);
     writeDb(db);
     return res.status(201).json(newInterest);
@@ -331,15 +479,28 @@ app.post("/api/interests", authMiddleware, (req, res) => {
   }
 });
 
-app.delete("/api/interests/:id", authMiddleware, (req, res) => {
-  const db = readDb();
-  const initialLength = db.interests.length;
-  db.interests = db.interests.filter((i) => String(i.id) !== String(req.params.id));
-  if (db.interests.length === initialLength) {
-    return res.status(404).json({ error: "Interest not found." });
+app.delete("/api/interests/:id", authMiddleware, async (req, res) => {
+  try {
+    if (isMongoConnected()) {
+      const deleted = await Interest.findOneAndDelete({ id: req.params.id });
+      if (!deleted) {
+        return res.status(404).json({ error: "Interest not found." });
+      }
+      return res.json({ message: "Interest deleted successfully." });
+    }
+
+    const db = readDb();
+    const initialLength = db.interests.length;
+    db.interests = db.interests.filter((i) => String(i.id) !== String(req.params.id));
+    if (db.interests.length === initialLength) {
+      return res.status(404).json({ error: "Interest not found." });
+    }
+    writeDb(db);
+    return res.json({ message: "Interest deleted successfully." });
+  } catch (err) {
+    console.error("Delete interest error:", err);
+    return res.status(500).json({ error: "Failed to delete interest." });
   }
-  writeDb(db);
-  return res.json({ message: "Interest deleted successfully." });
 });
 
 // Start Server
