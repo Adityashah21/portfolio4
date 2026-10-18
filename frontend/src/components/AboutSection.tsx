@@ -1,6 +1,8 @@
 import React from "react";
 import { SectionHeader } from "./SectionHeader";
-import { Zap, Crosshair, Gamepad2 } from "lucide-react";
+import { Zap, Crosshair, Gamepad2, FileDown } from "lucide-react";
+import { GithubIcon, LinkedinIcon, LeetCodeIcon } from "./icons/SocialIcons";
+import { Button } from "./ui/button";
 
 interface AboutSectionProps {
   projectsCount: number;
@@ -93,7 +95,52 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                 <dt className="text-muted-foreground">Side quests</dt>
                 <dd className="font-bold">Gaming &amp; comics</dd>
               </div>
+              <div className="flex items-center justify-between gap-4 py-3">
+                <dt className="text-muted-foreground">Equipped Links</dt>
+                <dd className="flex items-center gap-2">
+                  <a
+                    href="https://github.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="border border-ink bg-muted p-1.5 hover:bg-accent hover:text-accent-foreground transition-colors"
+                    title="GitHub"
+                  >
+                    <GithubIcon className="size-3.5" />
+                  </a>
+                  <a
+                    href="https://linkedin.com/in/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="border border-ink bg-muted p-1.5 hover:bg-accent hover:text-accent-foreground transition-colors"
+                    title="LinkedIn"
+                  >
+                    <LinkedinIcon className="size-3.5" />
+                  </a>
+                  <a
+                    href="https://leetcode.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="border border-ink bg-muted p-1.5 hover:bg-accent hover:text-accent-foreground transition-colors"
+                    title="LeetCode"
+                  >
+                    <LeetCodeIcon className="size-3.5 text-[#FFA116]" />
+                  </a>
+                </dd>
+              </div>
             </dl>
+
+            <div className="mt-6 flex items-center gap-3">
+              <Button asChild variant="comicYellow" size="sm">
+                <a
+                  href="/resume.pdf"
+                  download="Aditya_Shah_Resume.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <FileDown className="size-4" /> Download Resume
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
 

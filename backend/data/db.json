@@ -1,5 +1,13 @@
 {
-  "users": [],
+  "users": [
+    {
+      "id": "f7c9065d-5749-40e6-8978-64c3a8c979ba",
+      "email": "Adityashahofficial22@gmail.com",
+      "password": "$2b$10$lxTHgF6UyycjQ9h7/ekTbOUdEhtSutdI74MMGmc4R4tLafkL3oapO",
+      "role": "admin",
+      "created_at": "2026-10-18T16:56:13.526Z"
+    }
+  ],
   "projects": [
     {
       "id": "2553b44e-b258-4ffb-9f22-f1305546c35d",
@@ -35,28 +43,36 @@
       "created_at": "2026-10-18T15:38:36.782834+00:00"
     },
     {
-      "id": "10689962-10dd-47e3-8952-2411e8451925",
-      "name": "Python",
-      "category": "Code",
-      "level": 70,
-      "sort_order": 3,
-      "created_at": "2026-10-18T15:38:36.782834+00:00"
-    },
-    {
-      "id": "21684b76-d839-4f0d-b613-3b3809b7959b",
-      "name": "C / C++",
-      "category": "Code",
-      "level": 65,
-      "sort_order": 4,
-      "created_at": "2026-10-18T15:38:36.782834+00:00"
-    },
-    {
       "id": "6c717b78-cb9f-4dcc-a8bc-47d71622f3e0",
       "name": "Git & GitHub",
       "category": "Tools",
       "level": 70,
       "sort_order": 5,
       "created_at": "2026-10-18T15:38:36.782834+00:00"
+    },
+    {
+      "id": "48fc808a-995b-4743-b919-422025252891",
+      "name": "Node.js",
+      "category": "Code",
+      "level": 0,
+      "sort_order": 4,
+      "created_at": "2026-10-18T16:56:46.950Z"
+    },
+    {
+      "id": "598bf7b0-baaf-4a0d-9f1a-9d1f490628ab",
+      "name": "express.js",
+      "category": "Code",
+      "level": 0,
+      "sort_order": 5,
+      "created_at": "2026-10-18T16:56:55.466Z"
+    },
+    {
+      "id": "564ea2d7-abc1-42e3-a1ad-e1740c7dd1c7",
+      "name": "Mongo.db",
+      "category": "Code",
+      "level": 0,
+      "sort_order": 6,
+      "created_at": "2026-10-18T16:57:04.243Z"
     }
   ],
   "certifications": [

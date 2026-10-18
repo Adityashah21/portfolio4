@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "./ui/button";
-import { ArrowUpRight, ArrowDown, Gamepad2 } from "lucide-react";
+import { ArrowUpRight, ArrowDown, Gamepad2, FileDown } from "lucide-react";
 
 export const NextQuestSection: React.FC = () => {
   return (
@@ -32,6 +32,16 @@ export const NextQuestSection: React.FC = () => {
           <Button asChild variant="comic" size="lg">
             <a href="#top">
               Back to spawn <ArrowDown className="size-4 rotate-180" />
+            </a>
+          </Button>
+          <Button asChild variant="comicBlue" size="lg">
+            <a
+              href="/resume.pdf"
+              download="Aditya_Shah_Resume.pdf"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Resume <FileDown className="size-4" />
             </a>
           </Button>
         </div>
