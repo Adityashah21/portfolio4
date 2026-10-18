@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "./ui/button";
+import { ArrowDown } from "lucide-react";
 
 export const Hero: React.FC = () => {
   return (
@@ -15,7 +16,13 @@ export const Hero: React.FC = () => {
         className="absolute inset-0"
         style={{ background: "var(--gradient-hero)" }}
       />
-      <div className="relative mx-auto flex min-h-[85vh] max-w-6xl flex-col justify-center px-4 py-20">
+      <div className="web-corner" aria-hidden="true" />
+      <span className="hero-burst hidden lg:flex" aria-hidden="true">
+        LEVEL
+        <br />
+        UP!
+      </span>
+      <div className="portfolio-shell relative flex min-h-[76vh] flex-col justify-center py-16 md:py-20">
         <p className="font-pixel text-xs text-accent">
           PLAYER 1 · READY <span className="blink">▮</span>
         </p>
@@ -38,6 +45,12 @@ export const Hero: React.FC = () => {
             <a href="#skills">View Stats</a>
           </Button>
         </div>
+        <a
+          href="#about"
+          className="mt-10 inline-flex w-fit items-center gap-3 font-pixel text-[8px] leading-6 text-accent hover:text-accent-foreground transition-colors"
+        >
+          <ArrowDown className="scroll-cue size-5" /> THE STORY CONTINUES
+        </a>
       </div>
     </section>
   );

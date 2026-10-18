@@ -10,13 +10,32 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
   certifications,
 }) => {
   return (
-    <section id="certs" className="mx-auto max-w-6xl px-4 py-20">
+    <section
+      id="certs"
+      className="portfolio-shell py-24 md:py-28"
+      data-reveal
+    >
       <div className="mb-8 flex items-end gap-4">
         <span className="font-pixel text-[10px] text-accent">ISSUE #03</span>
         <h2 className="comic-title text-5xl text-foreground md:text-6xl">
           LOOT &amp; ACHIEVEMENTS
         </h2>
       </div>
+      <p className="mb-10 max-w-xl leading-7 text-muted-foreground">
+        Milestones collected along the way. Each one marks another step in the
+        engineering journey.
+      </p>
+
+      {certifications.length === 0 && (
+        <div className="flex min-h-52 flex-col items-center justify-center gap-4 border-y border-border text-center">
+          <Award className="size-12 text-accent" />
+          <p className="font-comic text-3xl">THE TROPHY CASE IS WAITING</p>
+          <p className="text-muted-foreground">
+            The next achievement is part of the journey.
+          </p>
+        </div>
+      )}
+
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {certifications.map((cert) => (
           <div

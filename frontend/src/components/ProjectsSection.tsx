@@ -1,7 +1,7 @@
 import React from "react";
 import { Project } from "../types";
 import { Button } from "./ui/button";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Crosshair } from "lucide-react";
 
 const GithubIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
@@ -27,13 +27,32 @@ interface ProjectsSectionProps {
 
 export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) => {
   return (
-    <section id="projects" className="mx-auto max-w-6xl px-4 py-20">
+    <section
+      id="projects"
+      className="portfolio-shell py-24 md:py-28"
+      data-reveal
+    >
       <div className="mb-8 flex items-end gap-4">
         <span className="font-pixel text-[10px] text-accent">ISSUE #01</span>
         <h2 className="comic-title text-5xl text-foreground md:text-6xl">
           QUESTS COMPLETED
         </h2>
       </div>
+      <p className="mb-10 max-w-xl leading-7 text-muted-foreground">
+        Ideas turned into playable checkpoints. Explore the projects, jump into a
+        live build, or look under the hood.
+      </p>
+
+      {projects.length === 0 && (
+        <div className="empty-quest flex min-h-64 flex-col items-center justify-center gap-4 border-[3px] border-dashed border-secondary bg-card/50 p-8 text-center">
+          <Crosshair className="size-12 text-secondary" />
+          <h3 className="font-comic text-3xl">THE FIRST QUEST IS ON ITS WAY</h3>
+          <p className="max-w-sm text-muted-foreground">
+            New builds will appear here as the story unfolds.
+          </p>
+        </div>
+      )}
+
       <div className="grid gap-8 md:grid-cols-2">
         {projects.map((project, idx) => (
           <article

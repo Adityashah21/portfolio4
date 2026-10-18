@@ -46,6 +46,11 @@ body {
   overflow-x: hidden;
 }
 
+.portfolio-shell {
+  width: 100%;
+  padding-inline: clamp(1rem, 3%, 4rem);
+}
+
 .comic-title {
   font-family: var(--font-comic);
   letter-spacing: 0.04em;
@@ -97,7 +102,10 @@ body {
 
 @supports (color: color-mix(in lab, red, red)) {
   .halftone {
-    background-image: radial-gradient(color-mix(in oklab, var(--ink) 55%, transparent) 1.2px, transparent 1.6px);
+    background-image: radial-gradient(
+      color-mix(in oklab, var(--ink) 55%, transparent) 1.2px,
+      transparent 1.6px
+    );
   }
 }
 
@@ -107,4 +115,124 @@ body {
 
 .blink {
   animation: 1s step-end infinite blink;
+}
+
+/* Scroll reveal animations */
+[data-reveal].reveal-ready {
+  opacity: 0;
+  transition: opacity 0.7s, transform 0.7s;
+  transform: translateY(28px);
+}
+
+[data-reveal].reveal-ready.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Signal strip marquee */
+.signal-track {
+  animation: 32s linear infinite signal-run;
+}
+
+.signal-strip:hover .signal-track {
+  animation-play-state: paused;
+}
+
+@keyframes signal-run {
+  to {
+    transform: translate(-50%);
+  }
+}
+
+/* Scroll cue bounce */
+.scroll-cue {
+  animation: 1.8s ease-in-out infinite scroll-bounce;
+}
+
+@keyframes scroll-bounce {
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+/* Hero burst explosion */
+.hero-burst {
+  text-align: center;
+  width: 150px;
+  height: 150px;
+  font-family: var(--font-comic);
+  color: var(--accent-foreground);
+  background: var(--accent);
+  clip-path: polygon(
+    50% 0%, 60% 18%, 79% 5%, 80% 28%, 100% 25%, 89% 47%, 100% 62%, 78% 67%,
+    81% 90%, 60% 82%, 50% 100%, 39% 81%, 18% 92%, 22% 68%, 0% 65%, 11% 46%,
+    0% 28%, 23% 27%, 21% 6%, 41% 18%
+  );
+  justify-content: center;
+  align-items: center;
+  font-size: 42px;
+  line-height: 1;
+  animation: 5s ease-in-out infinite burst-rock;
+  position: absolute;
+  top: 22%;
+  right: 8%;
+}
+
+@keyframes burst-rock {
+  0%, 100% {
+    transform: rotate(-9deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+/* Spider-web corner backgrounds */
+.web-corner {
+  aspect-ratio: 1;
+  opacity: 0.35;
+  pointer-events: none;
+  background: repeating-radial-gradient(
+      circle at 100% 0%,
+      transparent 0 47px,
+      var(--foreground) 48px 49px,
+      transparent 50px 70px
+    ),
+    conic-gradient(
+      from 180deg at 100% 0%,
+      transparent 0deg 12deg,
+      var(--foreground) 12deg 12.5deg,
+      transparent 12.5deg 30deg,
+      var(--foreground) 30deg 30.5deg,
+      transparent 30.5deg 48deg,
+      var(--foreground) 48deg 48.5deg,
+      transparent 48.5deg 66deg,
+      var(--foreground) 66deg 66.5deg,
+      transparent 66.5deg 88deg,
+      var(--foreground) 88deg 88.5deg,
+      transparent 88.5deg
+    );
+  width: min(38%, 450px);
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.web-corner-finale {
+  opacity: 0.18;
+  width: min(55%, 600px);
+}
+
+.mission-finale {
+  background-image: radial-gradient(var(--ink) 1px, transparent 1.5px);
+  background-size: 9px 9px;
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+  .mission-finale {
+    background-image: radial-gradient(
+      color-mix(in oklab, var(--ink) 30%, transparent) 1px,
+      transparent 1.5px
+    );
+  }
 }
