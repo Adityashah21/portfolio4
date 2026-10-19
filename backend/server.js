@@ -1,6 +1,6 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
@@ -13,8 +13,6 @@ import { connectMongo, isMongoConnected } from "./mongo.js";
 import { initCloudinary, isCloudinaryConfigured, uploadToCloudinary } from "./cloudinary.js";
 import { User, Project, Skill, Certification, Interest } from "./models/index.js";
 
-dotenv.config();
-
 // Initialize Cloud Services if configured in environment variables
 initCloudinary();
 connectMongo();
@@ -22,8 +20,34 @@ connectMongo();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable CORS and JSON parsing
-app.use(cors());
+// Configure CORS to support local development and deployed Vercel frontends
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (Postman, curl, server-to-server)
+    if (!origin) return callback(null, true);
+
+    try {
+      const url = new URL(origin);
+      if (
+        url.hostname === "localhost" ||
+        url.hostname === "127.0.0.1" ||
+        url.hostname.endsWith(".vercel.app") ||
+        origin === "https://portfolioadishah.vercel.app"
+      ) {
+        return callback(null, true);
+      }
+    } catch {
+      // Fall through on malformed origin
+    }
+    return callback(null, true);
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

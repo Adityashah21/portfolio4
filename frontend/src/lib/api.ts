@@ -1,5 +1,15 @@
 import { PortfolioData } from "../types";
-const BASE_URL = "https://portfolio4-qzqy.onrender.com";
+export const BASE_URL = (
+  import.meta.env.VITE_API_URL || "https://portfolio4-qzqy.onrender.com"
+).replace(/\/+$/, "");
+
+export function getImageUrl(url: string | null | undefined): string {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
+    return url;
+  }
+  return `${BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+}
 export const initialPortfolioData: PortfolioData = {
   projects: [
     {

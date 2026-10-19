@@ -219,6 +219,7 @@ export const Admin: React.FC<AdminProps> = ({
             type="email"
             placeholder="Email"
             required
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -227,6 +228,7 @@ export const Admin: React.FC<AdminProps> = ({
             placeholder="Password"
             required
             minLength={6}
+            autoComplete={authMode === "in" ? "current-password" : "new-password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
