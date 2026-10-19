@@ -33,7 +33,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateAdmin }) => {
             <span>LinkedIn</span>
           </a>
           <a
-            href="https://leetcode.com/Adityashah21"
+            href="https://leetcode.com/u/Adityacodes03/"
             target="_blank"
             rel="noreferrer"
             className="comic-panel comic-hover inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-foreground hover:text-accent transition-colors"

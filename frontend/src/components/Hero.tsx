@@ -85,7 +85,7 @@ export const Hero: React.FC = () => {
                 <span>LinkedIn</span>
               </a>
               <a
-                href="https://leetcode.com/Adityashah21"
+                href="https://leetcode.com/u/Adityacodes03/"
                 target="_blank"
                 rel="noreferrer"
                 className="comic-panel comic-hover flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-foreground hover:text-accent transition-colors"

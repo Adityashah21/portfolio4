@@ -117,7 +117,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                     <LinkedinIcon className="size-3.5" />
                   </a>
                   <a
-                    href="https://leetcode.com/Adityashah21"
+                    href="https://leetcode.com/u/Adityacodes03/"
                     target="_blank"
                     rel="noreferrer"
                     className="border border-ink bg-muted p-1.5 hover:bg-accent hover:text-accent-foreground transition-colors"
