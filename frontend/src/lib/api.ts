@@ -1,5 +1,5 @@
 import { PortfolioData } from "../types";
-
+const BASE_URL = "https://portfolio4-qzqy.onrender.com";
 export const initialPortfolioData: PortfolioData = {
   projects: [
     {
@@ -267,7 +267,7 @@ export function saveLocalPortfolioData(data: PortfolioData): void {
 
 export async function fetchPortfolioData(): Promise<PortfolioData> {
   try {
-    const res = await fetch("/api/portfolio");
+    const res = await fetch(`${BASE_URL}/api/portfolio`);
     if (res.ok) {
       const data = await res.json();
       saveLocalPortfolioData(data);
@@ -281,7 +281,7 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
 }
 
 export async function login(email: string, password: string) {
-  const res = await fetch("/api/auth/login", {
+  const res = await fetch(`${BASE_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -295,7 +295,7 @@ export async function login(email: string, password: string) {
 }
 
 export async function register(email: string, password: string) {
-  const res = await fetch("/api/auth/register", {
+  const res = await fetch(`${BASE_URL}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -313,7 +313,7 @@ export async function uploadFile(file: File): Promise<{ url: string; filename: s
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetch("/api/upload", {
+  const res = await fetch(`${BASE_URL}/api/upload`, {
     method: "POST",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: formData,
@@ -329,7 +329,7 @@ export async function uploadFile(file: File): Promise<{ url: string; filename: s
 export async function addItem(table: keyof PortfolioData, item: any): Promise<void> {
   const token = getToken();
   try {
-    const res = await fetch(`/api/${table}`, {
+    const res = await fetch(`${BASE_URL}/api/${table}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -359,7 +359,7 @@ export async function addItem(table: keyof PortfolioData, item: any): Promise<vo
 export async function deleteItem(table: keyof PortfolioData, id: string): Promise<void> {
   const token = getToken();
   try {
-    const res = await fetch(`/api/${table}/${id}`, {
+    const res = await fetch(`${BASE_URL}/api/${table}/${id}`, {
       method: "DELETE",
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
