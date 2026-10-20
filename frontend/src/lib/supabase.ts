@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { PortfolioData } from "../types";
+import { PortfolioData, PortfolioTable } from "../types";
 
 export const supabaseUrl =
   import.meta.env.VITE_SUPABASE_URL ||
@@ -159,7 +159,7 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
   return getLocalPortfolioData();
 }
 
-export async function addItem(table: keyof PortfolioData, item: any): Promise<void> {
+export async function addItem(table: PortfolioTable, item: any): Promise<void> {
   const local = getLocalPortfolioData();
   const newItem = {
     ...item,
@@ -177,7 +177,7 @@ export async function addItem(table: keyof PortfolioData, item: any): Promise<vo
   }
 }
 
-export async function deleteItem(table: keyof PortfolioData, id: string): Promise<void> {
+export async function deleteItem(table: PortfolioTable, id: string): Promise<void> {
   const local = getLocalPortfolioData();
   local[table] = (local[table] as any[]).filter((x) => String(x.id) !== String(id));
   saveLocalPortfolioData(local);

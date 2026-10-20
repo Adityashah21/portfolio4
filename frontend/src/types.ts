@@ -38,11 +38,14 @@ export interface Interest {
   created_at?: string;
 }
 
+export type PortfolioTable = "projects" | "skills" | "certifications" | "interests";
+
 export interface PortfolioData {
   projects: Project[];
   skills: Skill[];
   certifications: Certification[];
   interests: Interest[];
+  resume_url?: string | null;
 }
 
 export function getTier(level: number): "LEGENDARY" | "EPIC" | "RARE" | "COMMON" {

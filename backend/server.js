@@ -11,7 +11,7 @@ import { readDb, writeDb, uploadsDir } from "./db.js";
 import { authMiddleware, JWT_SECRET } from "./middleware/auth.js";
 import { connectMongo, isMongoConnected } from "./mongo.js";
 import { initCloudinary, isCloudinaryConfigured, uploadToCloudinary } from "./cloudinary.js";
-import { User, Project, Skill, Certification, Interest } from "./models/index.js";
+import { User, Project, Skill, Certification, Interest, Setting } from "./models/index.js";
 
 // Initialize Cloud Services if configured in environment variables
 initCloudinary();
@@ -205,14 +205,21 @@ app.get("/api/auth/me", authMiddleware, (req, res) => {
 app.get("/api/portfolio", async (_req, res) => {
   try {
     if (isMongoConnected()) {
-      const [projects, skills, certifications, interests] = await Promise.all([
+      const [projects, skills, certifications, interests, resumeSetting] = await Promise.all([
         Project.find().sort({ sort_order: 1, created_at: 1 }).lean(),
         Skill.find().sort({ sort_order: 1, created_at: 1 }).lean(),
         Certification.find().sort({ sort_order: 1, created_at: 1 }).lean(),
         Interest.find().sort({ sort_order: 1, created_at: 1 }).lean(),
+        Setting.findOne({ key: "resume_url" }).lean(),
       ]);
 
-      return res.json({ projects, skills, certifications, interests });
+      return res.json({
+        projects,
+        skills,
+        certifications,
+        interests,
+        resume_url: resumeSetting?.value || null,
+      });
     }
 
     // Fallback: Local JSON database
@@ -226,10 +233,72 @@ app.get("/api/portfolio", async (_req, res) => {
       skills: [...db.skills].sort(sortFn),
       certifications: [...db.certifications].sort(sortFn),
       interests: [...db.interests].sort(sortFn),
+      resume_url: db.resume_url || null,
     });
   } catch (err) {
     console.error("Get portfolio error:", err);
     return res.status(500).json({ error: "Failed to fetch portfolio data." });
+  }
+});
+
+// Resume Management (Get current resume or upload/update new resume)
+app.get("/api/resume", async (_req, res) => {
+  try {
+    if (isMongoConnected()) {
+      const setting = await Setting.findOne({ key: "resume_url" }).lean();
+      if (setting?.value) {
+        return res.json({ resume_url: setting.value });
+      }
+    }
+    const db = readDb();
+    return res.json({ resume_url: db.resume_url || "/resume.pdf" });
+  } catch (err) {
+    return res.json({ resume_url: "/resume.pdf" });
+  }
+});
+
+app.post("/api/resume", authMiddleware, upload.single("file"), async (req, res) => {
+  try {
+    let resumeUrl = req.body?.resume_url;
+
+    // Handle direct file upload for resume
+    if (req.file) {
+      if (isCloudinaryConfigured()) {
+        const result = await uploadToCloudinary(req.file.buffer, req.file.originalname || "resume.pdf");
+        resumeUrl = result.secure_url;
+      } else {
+        const ext = path.extname(req.file.originalname) || ".pdf";
+        const uniqueSuffix = Date.now() + "_" + Math.round(Math.random() * 1e6);
+        const filename = `resume_${uniqueSuffix}${ext}`;
+        const destinationPath = path.join(uploadsDir, filename);
+        await fs.promises.writeFile(destinationPath, req.file.buffer);
+        resumeUrl = `/uploads/${filename}`;
+      }
+    }
+
+    if (!resumeUrl) {
+      return res.status(400).json({ error: "No resume file or URL provided." });
+    }
+
+    if (isMongoConnected()) {
+      await Setting.findOneAndUpdate(
+        { key: "resume_url" },
+        { key: "resume_url", value: resumeUrl },
+        { upsert: true, new: true }
+      );
+    }
+
+    const db = readDb();
+    db.resume_url = resumeUrl;
+    writeDb(db);
+
+    return res.json({
+      message: "Resume updated successfully.",
+      resume_url: resumeUrl,
+    });
+  } catch (err) {
+    console.error("Update resume error:", err);
+    return res.status(500).json({ error: "Failed to update resume: " + err.message });
   }
 });
 

@@ -19,6 +19,7 @@ if (!fs.existsSync(uploadsDir)) {
 
 export const initialData = {
   users: [],
+  resume_url: "/resume.pdf",
   projects: [
     {
       id: "rescrafted-mern-marketplace",

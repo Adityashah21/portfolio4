@@ -8,12 +8,14 @@ interface AboutSectionProps {
   projectsCount: number;
   skillsCount: number;
   achievementsCount: number;
+  resumeUrl?: string;
 }
 
 export const AboutSection: React.FC<AboutSectionProps> = ({
   projectsCount,
   skillsCount,
   achievementsCount,
+  resumeUrl = "/resume.pdf",
 }) => {
   return (
     <>
@@ -132,7 +134,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
             <div className="mt-6 flex items-center gap-3">
               <Button asChild variant="comicYellow" size="sm">
                 <a
-                  href="/resume.pdf"
+                  href={resumeUrl}
                   download="Aditya_Shah_Resume.pdf"
                   target="_blank"
                   rel="noreferrer"

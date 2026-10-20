@@ -1,4 +1,4 @@
-import { PortfolioData } from "../types";
+import { PortfolioData, PortfolioTable } from "../types";
 export const BASE_URL = "https://portfolio4-qzqy.onrender.com";
 
 export function getImageUrl(url: string | null | undefined): string {
@@ -9,6 +9,7 @@ export function getImageUrl(url: string | null | undefined): string {
   return `${BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 export const initialPortfolioData: PortfolioData = {
+  resume_url: "/resume.pdf",
   projects: [
     {
       id: "rescrafted-mern-marketplace",
@@ -334,7 +335,7 @@ export async function uploadFile(file: File): Promise<{ url: string; filename: s
   return data;
 }
 
-export async function addItem(table: keyof PortfolioData, item: any): Promise<void> {
+export async function addItem(table: PortfolioTable, item: any): Promise<void> {
   const token = getToken();
   try {
     const res = await fetch(`${BASE_URL}/api/${table}`, {
@@ -364,7 +365,7 @@ export async function addItem(table: keyof PortfolioData, item: any): Promise<vo
   saveLocalPortfolioData(local);
 }
 
-export async function deleteItem(table: keyof PortfolioData, id: string): Promise<void> {
+export async function deleteItem(table: PortfolioTable, id: string): Promise<void> {
   const token = getToken();
   try {
     const res = await fetch(`${BASE_URL}/api/${table}/${id}`, {
@@ -384,3 +385,40 @@ export async function deleteItem(table: keyof PortfolioData, id: string): Promis
   local[table] = (local[table] as any[]).filter((x) => String(x.id) !== String(id));
   saveLocalPortfolioData(local);
 }
+
+export async function updateResume(input: File | string): Promise<{ resume_url: string }> {
+  const token = getToken();
+  let res: Response;
+
+  if (typeof input === "string") {
+    res = await fetch(`${BASE_URL}/api/resume`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ resume_url: input }),
+    });
+  } else {
+    const formData = new FormData();
+    formData.append("file", input);
+    res = await fetch(`${BASE_URL}/api/resume`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    });
+  }
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to update resume");
+  }
+
+  // Update local cache
+  const local = getLocalPortfolioData();
+  local.resume_url = data.resume_url;
+  saveLocalPortfolioData(local);
+
+  return data;
+}
+

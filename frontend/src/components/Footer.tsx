@@ -4,9 +4,10 @@ import { GithubIcon, LinkedinIcon, LeetCodeIcon } from "./icons/SocialIcons";
 
 interface FooterProps {
   onNavigateAdmin?: () => void;
+  resumeUrl?: string;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigateAdmin }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigateAdmin, resumeUrl = "/resume.pdf" }) => {
   return (
     <footer className="border-t-[3px] border-ink py-12 text-center bg-background">
       <div className="portfolio-shell mx-auto max-w-4xl">
@@ -51,7 +52,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateAdmin }) => {
             <span>Email</span>
           </a>
           <a
-            href="/resume.pdf"
+            href={resumeUrl}
             download="Aditya_Shah_Resume.pdf"
             target="_blank"
             rel="noreferrer"

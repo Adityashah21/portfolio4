@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { PortfolioData } from "../types";
+import { getImageUrl } from "../lib/api";
 import { Navbar } from "../components/Navbar";
 import { Hero } from "../components/Hero";
 import { AboutSection } from "../components/AboutSection";
@@ -48,14 +49,17 @@ export const Portfolio: React.FC<PortfolioProps> = ({
     };
   }, [data]);
 
+  const resumeUrl = getImageUrl(data.resume_url || "/resume.pdf");
+
   return (
     <main className="min-h-screen">
       <Navbar totalXp={totalXp} />
-      <Hero />
+      <Hero resumeUrl={resumeUrl} />
       <AboutSection
         projectsCount={data.projects.length}
         skillsCount={data.skills.length}
         achievementsCount={data.certifications.length}
+        resumeUrl={resumeUrl}
       />
       <ProjectsSection projects={data.projects} />
       <SkillsSection skills={data.skills} totalXp={totalXp} />
@@ -64,7 +68,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({
       <PlaybookSection />
       <InterestsSection interests={data.interests} />
       <NextQuestSection />
-      <Footer onNavigateAdmin={onNavigateAdmin} />
+      <Footer onNavigateAdmin={onNavigateAdmin} resumeUrl={resumeUrl} />
     </main>
   );
 };

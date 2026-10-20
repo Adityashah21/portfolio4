@@ -3,7 +3,11 @@ import { Button } from "./ui/button";
 import { ArrowDown, FileDown } from "lucide-react";
 import { GithubIcon, LinkedinIcon, LeetCodeIcon } from "./icons/SocialIcons";
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  resumeUrl?: string;
+}
+
+export const Hero: React.FC<HeroProps> = ({ resumeUrl = "/resume.pdf" }) => {
   return (
     <section id="top" className="relative overflow-hidden border-b-[3px] border-ink">
       {/* Background City Image */}
@@ -49,7 +53,7 @@ export const Hero: React.FC = () => {
               </Button>
               <Button asChild variant="comicYellow" size="lg">
                 <a
-                  href="/resume.pdf"
+                  href={resumeUrl}
                   download="Aditya_Shah_Resume.pdf"
                   target="_blank"
                   rel="noreferrer"
