@@ -69,118 +69,57 @@ export const initialPortfolioData: PortfolioData = {
       created_at: "2026-10-18T17:00:00.000000+00:00"
     }
   ],
-  skills: [
-    {
-      id: "skill-javascript",
-      name: "JavaScript (ES6+)",
-      category: "Languages",
-      level: 90,
-      sort_order: 1,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
-    },
-    {
-      id: "skill-react",
-      name: "React.js & Router",
-      category: "Frontend",
-      level: 88,
-      sort_order: 2,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
-    },
-    {
-      id: "skill-nodejs",
-      name: "Node.js & Express.js",
-      category: "Backend",
-      level: 85,
-      sort_order: 3,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
-    },
-    {
-      id: "skill-mongodb",
-      name: "MongoDB & Mongoose",
-      category: "Databases",
-      level: 82,
-      sort_order: 4,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
-    },
-    {
-      id: "skill-java",
-      name: "Java & OOPs",
-      category: "Languages",
-      level: 80,
-      sort_order: 5,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
-    },
-    {
-      id: "skill-dsa",
-      name: "Data Structures & Algorithms",
-      category: "Core CS",
-      level: 85,
-      sort_order: 6,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
-    },
-    {
-      id: "skill-socketio",
-      name: "Socket.IO & Real-Time Events",
-      category: "Backend",
-      level: 80,
-      sort_order: 7,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
-    },
-    {
-      id: "skill-tailwind",
-      name: "Tailwind CSS & Responsive UI",
-      category: "Frontend",
-      level: 90,
-      sort_order: 8,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
-    },
-    {
-      id: "skill-sql",
-      name: "SQL & Relational DBs",
-      category: "Databases",
-      level: 78,
-      sort_order: 9,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
-    },
-    {
-      id: "skill-git",
-      name: "Git & GitHub Workflow",
-      category: "Tools",
-      level: 85,
-      sort_order: 10,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
-    }
-  ],
+  skills: [],
   certifications: [
     {
-      id: "cert-nptel-dsa",
-      title: "NPTEL Elite (Silver) — Data Structures and Algorithms",
-      issuer: "IIT Kanpur",
-      issued_on: "Jul–Oct 2023",
-      credential_url: "https://nptel.ac.in/",
-      image_url: null,
+      id: "75847c5a-127a-4505-b49b-fc10d53b06db",
+      title: "Web Development for Beginners",
+      issuer: "Simplilearn",
+      issued_on: "Sep 2025",
+      credential_url: null,
+      image_url: "/uploads/Simplilearn_Certificate-1_1792614603000_30203.pdf",
       sort_order: 1,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
+      created_at: "2026-10-21T20:31:37.924Z"
     },
     {
-      id: "cert-yukti-hackathon",
-      title: "Yukti Startup Hackathon — Top 7 Finalist",
-      issuer: "Yukti Innovation Initiative",
-      issued_on: "2024",
+      id: "d325b3c5-83d3-4d98-b0a5-32bc4e576c93",
+      title: "JavaScript for Beginners",
+      issuer: "Simplilearn",
+      issued_on: "Aug 2025",
       credential_url: null,
-      image_url: null,
+      image_url: "/uploads/Simplilearn_Certificate_1792614714445_396237.pdf",
       sort_order: 2,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
+      created_at: "2026-10-21T20:32:33.380Z"
     },
     {
-      id: "cert-sih",
-      title: "Smart India Hackathon — College Round Qualifier",
-      issuer: "Ministry of Education / AICTE",
-      issued_on: "2024 & 2025",
+      id: "886fc41d-8755-4539-a721-fa4587e7dcf8",
+      title: "Programming Fundamentals using Python – Science Graduates – Foundation Program",
+      issuer: "Wingspan",
+      issued_on: "Sep 2024",
+      credential_url: "https://verify.onwingspan.com",
+      image_url: "/uploads/python_1792614762258_897212.pdf",
+      sort_order: 3,
+      created_at: "2026-10-21T20:33:30.008Z"
+    },
+    {
+      id: "ab07102c-2595-42f6-aa56-9ab5a5845dec",
+      title: "Peer Training on Web Development",
+      issuer: "GNIOT CSE-Tech Club & Department of Computer Science and Engineering, Greater Noida Institute of Technology (GNIOT)",
+      issued_on: "Apr 2025",
+      credential_url: null,
+      image_url: "/uploads/PT_certificate_1792614818072_288419.pdf",
+      sort_order: 4,
+      created_at: "2026-10-21T20:35:11.684Z"
+    },
+    {
+      id: "eb122cef-5d2b-4e5c-a9d1-17d17abdb19a",
+      title: "Introduction to Front End Development",
+      issuer: "Simplilearn",
+      issued_on: "Aug 2025",
       credential_url: null,
       image_url: null,
-      sort_order: 3,
-      created_at: "2026-10-18T15:38:36.782834+00:00"
+      sort_order: 5,
+      created_at: "2026-10-21T20:37:28.386Z"
     }
   ],
   interests: [
@@ -281,6 +220,13 @@ export function getLocalPortfolioData(): PortfolioData {
       const parsed = JSON.parse(raw);
       if (!parsed.resume_url) {
         parsed.resume_url = getStoredResumeUrl() || "/resume.pdf";
+      }
+      if (Array.isArray(parsed.skills)) {
+        parsed.skills = parsed.skills.filter((s: any) => !String(s.id).startsWith("skill-"));
+      }
+      if (Array.isArray(parsed.certifications)) {
+        const dummyCertIds = ["cert-nptel-dsa", "cert-yukti-hackathon", "cert-sih"];
+        parsed.certifications = parsed.certifications.filter((c: any) => !dummyCertIds.includes(String(c.id)));
       }
       return parsed;
     }

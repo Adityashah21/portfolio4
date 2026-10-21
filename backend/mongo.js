@@ -21,6 +21,7 @@ export async function connectMongo() {
     console.log("🍃 Connected to MongoDB Atlas successfully.");
 
     await seedMongoIfEmpty();
+    await cleanupHardcodedItems();
     return true;
   } catch (err) {
     console.error("❌ Failed to connect to MongoDB Atlas:", err.message);
@@ -56,5 +57,22 @@ async function seedMongoIfEmpty() {
     }
   } catch (err) {
     console.error("Error during initial data seeding:", err);
+  }
+}
+
+async function cleanupHardcodedItems() {
+  try {
+    const hardcodedCertIds = ["cert-nptel-dsa", "cert-yukti-hackathon", "cert-sih"];
+    const certResult = await Certification.deleteMany({ id: { $in: hardcodedCertIds } });
+    if (certResult.deletedCount > 0) {
+      console.log(`🧹 Cleaned up ${certResult.deletedCount} hardcoded template certifications from MongoDB.`);
+    }
+
+    const skillResult = await Skill.deleteMany({ id: /^skill-/ });
+    if (skillResult.deletedCount > 0) {
+      console.log(`🧹 Cleaned up ${skillResult.deletedCount} hardcoded template skills from MongoDB.`);
+    }
+  } catch (err) {
+    console.warn("⚠️ Cleanup hardcoded items error:", err.message);
   }
 }
