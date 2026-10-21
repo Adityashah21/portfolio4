@@ -417,6 +417,40 @@ export async function deleteItem(table: PortfolioTable, id: string): Promise<voi
   saveLocalPortfolioData(local);
 }
 
+export async function updateItem(
+  table: PortfolioTable,
+  id: string,
+  item: any
+): Promise<void> {
+  const token = getToken();
+  try {
+    const res = await fetch(`${BASE_URL}/api/${table}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(item),
+    });
+
+    if (res.ok) {
+      return;
+    }
+  } catch (e) {
+    console.warn(`Backend PUT to ${table}/${id} failed, updating local fallback:`, e);
+  }
+
+  // Local fallback
+  const local = getLocalPortfolioData();
+  const list = (local[table] as any[]) || [];
+  const idx = list.findIndex((x) => String(x.id) === String(id));
+  if (idx !== -1) {
+    list[idx] = { ...list[idx], ...item, id };
+    local[table] = [...list] as any;
+    saveLocalPortfolioData(local);
+  }
+}
+
 export async function updateResume(input: File | string): Promise<{ resume_url: string }> {
   let resumeUrl = "";
 

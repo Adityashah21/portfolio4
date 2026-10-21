@@ -9,6 +9,7 @@ import {
   getStoredUser,
   clearAuthSession,
   addItem,
+  updateItem,
   deleteItem,
   uploadFile,
   updateResume,
@@ -16,7 +17,7 @@ import {
   getImageUrl,
 } from "../lib/api";
 import { toast } from "sonner";
-import { Trash2, Upload, CheckCircle2, FileText, FileUp, ExternalLink, Download } from "lucide-react";
+import { Trash2, Upload, CheckCircle2, FileText, FileUp, ExternalLink, Download, Pencil, X } from "lucide-react";
 
 interface AdminProps {
   data: PortfolioData;
@@ -90,6 +91,7 @@ export const Admin: React.FC<AdminProps> = ({
   const [authLoading, setAuthLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<PortfolioTable | "resume">("projects");
   const [formData, setFormData] = useState<Record<string, string>>({});
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [resumeUrlInput, setResumeUrlInput] = useState("");
@@ -167,12 +169,37 @@ export const Admin: React.FC<AdminProps> = ({
     }
   };
 
-  const handleAddItem = async (e: React.FormEvent) => {
+  const handleStartEdit = (item: any) => {
+    if (activeTab === "resume") return;
+    setEditingId(String(item.id));
+    const config = tableConfigs[activeTab];
+    const newForm: Record<string, string> = {};
+    for (const f of config.fields) {
+      if (item[f.key] !== undefined && item[f.key] !== null) {
+        if (f.type === "list" && Array.isArray(item[f.key])) {
+          newForm[f.key] = item[f.key].join(", ");
+        } else {
+          newForm[f.key] = String(item[f.key]);
+        }
+      } else {
+        newForm[f.key] = "";
+      }
+    }
+    setFormData(newForm);
+    window.scrollTo({ top: 150, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setFormData({});
+  };
+
+  const handleSaveItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (activeTab === "resume") return;
     const config = tableConfigs[activeTab];
     const items = data[activeTab] || [];
-    const payload: any = {
+    const payload: any = editingId ? {} : {
       sort_order: items.length + 1,
     };
 
@@ -184,18 +211,24 @@ export const Admin: React.FC<AdminProps> = ({
         payload[f.key] = val
           ? val.split(",").map((s) => s.trim()).filter(Boolean)
           : [];
-      } else if (val) {
+      } else {
         payload[f.key] = val;
       }
     }
 
     try {
-      await addItem(activeTab, payload);
-      toast.success("Added successfully!");
+      if (editingId) {
+        await updateItem(activeTab, editingId, payload);
+        toast.success("Updated successfully!");
+        setEditingId(null);
+      } else {
+        await addItem(activeTab, payload);
+        toast.success("Added successfully!");
+      }
       setFormData({});
       onRefresh();
     } catch (err: any) {
-      toast.error(err.message || "Failed to add item");
+      toast.error(err.message || (editingId ? "Failed to update item" : "Failed to add item"));
     }
   };
 
@@ -203,6 +236,10 @@ export const Admin: React.FC<AdminProps> = ({
     if (activeTab === "resume") return;
     try {
       await deleteItem(activeTab, id);
+      if (editingId === id) {
+        setEditingId(null);
+        setFormData({});
+      }
       toast.success("Deleted!");
       onRefresh();
     } catch (err: any) {
@@ -292,6 +329,7 @@ export const Admin: React.FC<AdminProps> = ({
                 size="sm"
                 onClick={() => {
                   setActiveTab(tab);
+                  setEditingId(null);
                   setFormData({});
                 }}
               >
@@ -303,6 +341,8 @@ export const Admin: React.FC<AdminProps> = ({
               size="sm"
               onClick={() => {
                 setActiveTab("resume");
+                setEditingId(null);
+                setFormData({});
               }}
             >
               📄 Resume
@@ -434,12 +474,23 @@ export const Admin: React.FC<AdminProps> = ({
           ) : (
             <div className="grid gap-6 md:grid-cols-2">
               <form
-                onSubmit={handleAddItem}
+                onSubmit={handleSaveItem}
                 className="comic-panel space-y-3 p-5"
               >
-                <p className="font-pixel text-[10px] text-accent">
-                  ADD {tableConfigs[activeTab as PortfolioTable].title.toUpperCase()}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="font-pixel text-[10px] text-accent">
+                    {editingId ? "EDIT" : "ADD"} {tableConfigs[activeTab as PortfolioTable].title.toUpperCase()}
+                  </p>
+                  {editingId && (
+                    <button
+                      type="button"
+                      onClick={handleCancelEdit}
+                      className="inline-flex items-center gap-1 font-pixel text-[9px] text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <X className="size-3" /> CANCEL
+                    </button>
+                  )}
+                </div>
                 {tableConfigs[activeTab as PortfolioTable].fields.map((field) => {
                   if (field.type === "textarea") {
                     return (
@@ -514,28 +565,57 @@ export const Admin: React.FC<AdminProps> = ({
                     />
                   );
                 })}
-                <Button type="submit" variant="comic" className="w-full">
-                  Add
-                </Button>
+                {editingId ? (
+                  <div className="flex gap-2 pt-1">
+                    <Button type="submit" variant="comic" className="flex-1">
+                      Save Changes
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="comicYellow"
+                      onClick={handleCancelEdit}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                ) : (
+                  <Button type="submit" variant="comic" className="w-full">
+                    Add
+                  </Button>
+                )}
               </form>
 
               <div className="space-y-3">
                 {((data[activeTab as PortfolioTable] || []) as any[]).map((item: any) => (
                   <div
                     key={String(item.id)}
-                    className="comic-panel flex items-center justify-between gap-3 p-3"
+                    className={`comic-panel flex items-center justify-between gap-3 p-3 transition-colors ${
+                      editingId === String(item.id) ? "border-primary bg-primary/10 ring-2 ring-primary" : ""
+                    }`}
                   >
                     <span className="truncate">
                       {tableConfigs[activeTab as PortfolioTable].display(item)}
                     </span>
-                    <Button
-                      variant="comic"
-                      size="icon"
-                      aria-label="Delete"
-                      onClick={() => handleDeleteItem(String(item.id))}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        variant={editingId === String(item.id) ? "comicYellow" : "comicBlue"}
+                        size="icon"
+                        aria-label="Edit"
+                        title="Edit item"
+                        onClick={() => handleStartEdit(item)}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                      <Button
+                        variant="comic"
+                        size="icon"
+                        aria-label="Delete"
+                        title="Delete item"
+                        onClick={() => handleDeleteItem(String(item.id))}
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
                 {((data[activeTab as PortfolioTable] || []) as any[]).length === 0 && (

@@ -424,6 +424,50 @@ app.delete("/api/projects/:id", authMiddleware, async (req, res) => {
   }
 });
 
+app.put("/api/projects/:id", authMiddleware, async (req, res) => {
+  try {
+    const { title, description, tech, live_url, repo_url, image_url, sort_order } = req.body;
+    const updates = {};
+    if (title !== undefined) updates.title = title;
+    if (description !== undefined) updates.description = description;
+    if (tech !== undefined) {
+      updates.tech = Array.isArray(tech)
+        ? tech
+        : typeof tech === "string"
+        ? tech.split(",").map((s) => s.trim()).filter(Boolean)
+        : [];
+    }
+    if (live_url !== undefined) updates.live_url = live_url || null;
+    if (repo_url !== undefined) updates.repo_url = repo_url || null;
+    if (image_url !== undefined) updates.image_url = image_url || null;
+    if (sort_order !== undefined) updates.sort_order = Number(sort_order);
+
+    if (isMongoConnected()) {
+      const updated = await Project.findOneAndUpdate(
+        { id: req.params.id },
+        { $set: updates },
+        { new: true }
+      );
+      if (!updated) {
+        return res.status(404).json({ error: "Project not found." });
+      }
+      return res.json(updated);
+    }
+
+    const db = readDb();
+    const idx = db.projects.findIndex((p) => String(p.id) === String(req.params.id));
+    if (idx === -1) {
+      return res.status(404).json({ error: "Project not found." });
+    }
+    db.projects[idx] = { ...db.projects[idx], ...updates };
+    writeDb(db);
+    return res.json(db.projects[idx]);
+  } catch (err) {
+    console.error("Update project error:", err);
+    return res.status(500).json({ error: "Failed to update project." });
+  }
+});
+
 // ---------------- SKILLS CRUD ---------------- //
 
 app.post("/api/skills", authMiddleware, async (req, res) => {
@@ -481,6 +525,41 @@ app.delete("/api/skills/:id", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("Delete skill error:", err);
     return res.status(500).json({ error: "Failed to delete skill." });
+  }
+});
+
+app.put("/api/skills/:id", authMiddleware, async (req, res) => {
+  try {
+    const { name, category, level, sort_order } = req.body;
+    const updates = {};
+    if (name !== undefined) updates.name = name;
+    if (category !== undefined) updates.category = category;
+    if (level !== undefined) updates.level = Math.max(0, Math.min(100, Number(level) || 0));
+    if (sort_order !== undefined) updates.sort_order = Number(sort_order);
+
+    if (isMongoConnected()) {
+      const updated = await Skill.findOneAndUpdate(
+        { id: req.params.id },
+        { $set: updates },
+        { new: true }
+      );
+      if (!updated) {
+        return res.status(404).json({ error: "Skill not found." });
+      }
+      return res.json(updated);
+    }
+
+    const db = readDb();
+    const idx = db.skills.findIndex((s) => String(s.id) === String(req.params.id));
+    if (idx === -1) {
+      return res.status(404).json({ error: "Skill not found." });
+    }
+    db.skills[idx] = { ...db.skills[idx], ...updates };
+    writeDb(db);
+    return res.json(db.skills[idx]);
+  } catch (err) {
+    console.error("Update skill error:", err);
+    return res.status(500).json({ error: "Failed to update skill." });
   }
 });
 
@@ -547,6 +626,43 @@ app.delete("/api/certifications/:id", authMiddleware, async (req, res) => {
   }
 });
 
+app.put("/api/certifications/:id", authMiddleware, async (req, res) => {
+  try {
+    const { title, issuer, issued_on, credential_url, image_url, sort_order } = req.body;
+    const updates = {};
+    if (title !== undefined) updates.title = title;
+    if (issuer !== undefined) updates.issuer = issuer;
+    if (issued_on !== undefined) updates.issued_on = issued_on || null;
+    if (credential_url !== undefined) updates.credential_url = credential_url || null;
+    if (image_url !== undefined) updates.image_url = image_url || null;
+    if (sort_order !== undefined) updates.sort_order = Number(sort_order);
+
+    if (isMongoConnected()) {
+      const updated = await Certification.findOneAndUpdate(
+        { id: req.params.id },
+        { $set: updates },
+        { new: true }
+      );
+      if (!updated) {
+        return res.status(404).json({ error: "Certification not found." });
+      }
+      return res.json(updated);
+    }
+
+    const db = readDb();
+    const idx = db.certifications.findIndex((c) => String(c.id) === String(req.params.id));
+    if (idx === -1) {
+      return res.status(404).json({ error: "Certification not found." });
+    }
+    db.certifications[idx] = { ...db.certifications[idx], ...updates };
+    writeDb(db);
+    return res.json(db.certifications[idx]);
+  } catch (err) {
+    console.error("Update certification error:", err);
+    return res.status(500).json({ error: "Failed to update certification." });
+  }
+});
+
 // ---------------- INTERESTS CRUD ---------------- //
 
 app.post("/api/interests", authMiddleware, async (req, res) => {
@@ -602,6 +718,40 @@ app.delete("/api/interests/:id", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("Delete interest error:", err);
     return res.status(500).json({ error: "Failed to delete interest." });
+  }
+});
+
+app.put("/api/interests/:id", authMiddleware, async (req, res) => {
+  try {
+    const { name, emoji, sort_order } = req.body;
+    const updates = {};
+    if (name !== undefined) updates.name = name;
+    if (emoji !== undefined) updates.emoji = emoji || "✨";
+    if (sort_order !== undefined) updates.sort_order = Number(sort_order);
+
+    if (isMongoConnected()) {
+      const updated = await Interest.findOneAndUpdate(
+        { id: req.params.id },
+        { $set: updates },
+        { new: true }
+      );
+      if (!updated) {
+        return res.status(404).json({ error: "Interest not found." });
+      }
+      return res.json(updated);
+    }
+
+    const db = readDb();
+    const idx = db.interests.findIndex((i) => String(i.id) === String(req.params.id));
+    if (idx === -1) {
+      return res.status(404).json({ error: "Interest not found." });
+    }
+    db.interests[idx] = { ...db.interests[idx], ...updates };
+    writeDb(db);
+    return res.json(db.interests[idx]);
+  } catch (err) {
+    console.error("Update interest error:", err);
+    return res.status(500).json({ error: "Failed to update interest." });
   }
 });
 

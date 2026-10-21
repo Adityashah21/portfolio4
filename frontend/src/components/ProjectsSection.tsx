@@ -2,6 +2,7 @@ import React from "react";
 import { Project } from "../types";
 import { Button } from "./ui/button";
 import { ExternalLink, Crosshair } from "lucide-react";
+import { getImageUrl } from "../lib/api";
 
 const GithubIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
@@ -61,10 +62,13 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) =>
             <div className="halftone relative aspect-video border-b-[3px] border-ink bg-secondary">
               {project.image_url ? (
                 <img
-                  src={project.image_url}
+                  src={getImageUrl(project.image_url)}
                   alt={project.title}
                   loading="lazy"
                   className="h-full w-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center comic-title text-6xl text-accent">
