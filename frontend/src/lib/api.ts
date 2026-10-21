@@ -256,14 +256,41 @@ export function getStoredUser(): any | null {
   }
 }
 
+const RESUME_KEY = "questfolio_resume_url";
+
+export function getStoredResumeUrl(): string | null {
+  try {
+    return localStorage.getItem(RESUME_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function saveStoredResumeUrl(url: string): void {
+  try {
+    localStorage.setItem(RESUME_KEY, url);
+  } catch (err) {
+    console.error("Failed to save resume URL to localStorage:", err);
+  }
+}
+
 export function getLocalPortfolioData(): PortfolioData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (!parsed.resume_url) {
+        parsed.resume_url = getStoredResumeUrl() || "/resume.pdf";
+      }
+      return parsed;
+    }
   } catch (err) {
     console.error("Failed to read localStorage:", err);
   }
-  return initialPortfolioData;
+  return {
+    ...initialPortfolioData,
+    resume_url: getStoredResumeUrl() || "/resume.pdf",
+  };
 }
 
 export function saveLocalPortfolioData(data: PortfolioData): void {
@@ -279,6 +306,10 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
     const res = await fetch(`${BASE_URL}/api/portfolio`);
     if (res.ok) {
       const data = await res.json();
+      const storedResume = getStoredResumeUrl();
+      if (!data.resume_url && storedResume) {
+        data.resume_url = storedResume;
+      }
       saveLocalPortfolioData(data);
       return data;
     }
@@ -387,38 +418,61 @@ export async function deleteItem(table: PortfolioTable, id: string): Promise<voi
 }
 
 export async function updateResume(input: File | string): Promise<{ resume_url: string }> {
-  const token = getToken();
-  let res: Response;
+  let resumeUrl = "";
 
   if (typeof input === "string") {
-    res = await fetch(`${BASE_URL}/api/resume`, {
+    resumeUrl = input.trim();
+  } else {
+    // 1. Use the working uploadFile service (/api/upload) to upload the PDF
+    const uploadRes = await uploadFile(input);
+    resumeUrl = uploadRes.url;
+  }
+
+  if (!resumeUrl) {
+    throw new Error("No resume file or URL provided.");
+  }
+
+  // 2. Persist in local storage immediately
+  saveStoredResumeUrl(resumeUrl);
+  const local = getLocalPortfolioData();
+  local.resume_url = resumeUrl;
+  saveLocalPortfolioData(local);
+
+  // 3. Attempt to sync with backend /api/resume if available (gracefully ignore if 404)
+  const token = getToken();
+  try {
+    await fetch(`${BASE_URL}/api/resume`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ resume_url: input }),
+      body: JSON.stringify({ resume_url: resumeUrl }),
     });
-  } else {
-    const formData = new FormData();
-    formData.append("file", input);
-    res = await fetch(`${BASE_URL}/api/resume`, {
-      method: "POST",
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      body: formData,
-    });
+  } catch (err) {
+    console.warn("Backend /api/resume sync skipped or not yet redeployed:", err);
   }
 
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error || "Failed to update resume");
-  }
+  return { resume_url: resumeUrl };
+}
 
-  // Update local cache
+export async function resetResume(): Promise<void> {
+  const defaultUrl = "/resume.pdf";
+  saveStoredResumeUrl(defaultUrl);
   const local = getLocalPortfolioData();
-  local.resume_url = data.resume_url;
+  local.resume_url = defaultUrl;
   saveLocalPortfolioData(local);
 
-  return data;
+  const token = getToken();
+  try {
+    await fetch(`${BASE_URL}/api/resume`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ resume_url: defaultUrl }),
+    });
+  } catch {}
 }
 

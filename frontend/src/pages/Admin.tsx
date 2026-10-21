@@ -12,6 +12,7 @@ import {
   deleteItem,
   uploadFile,
   updateResume,
+  resetResume,
   getImageUrl,
 } from "../lib/api";
 import { toast } from "sonner";
@@ -356,6 +357,20 @@ export const Admin: React.FC<AdminProps> = ({
                       <span>Download</span>
                     </a>
                   </Button>
+                  {data.resume_url && data.resume_url !== "/resume.pdf" && (
+                    <Button
+                      type="button"
+                      variant="comic"
+                      size="sm"
+                      onClick={async () => {
+                        await resetResume();
+                        toast.success("Resume reset to default (/resume.pdf)");
+                        onRefresh();
+                      }}
+                    >
+                      Reset Default
+                    </Button>
+                  )}
                 </div>
               </div>
 
