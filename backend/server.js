@@ -264,9 +264,14 @@ app.post("/api/resume", authMiddleware, upload.single("file"), async (req, res) 
     // Handle direct file upload for resume
     if (req.file) {
       if (isCloudinaryConfigured()) {
-        const result = await uploadToCloudinary(req.file.buffer, req.file.originalname || "resume.pdf");
-        resumeUrl = result.secure_url;
-      } else {
+        try {
+          const result = await uploadToCloudinary(req.file.buffer, req.file.originalname || "resume.pdf");
+          resumeUrl = result.secure_url;
+        } catch (cloudErr) {
+          console.warn("⚠️ Cloudinary upload failed for resume, falling back to local storage:", cloudErr.message);
+        }
+      }
+      if (!resumeUrl) {
         const ext = path.extname(req.file.originalname) || ".pdf";
         const uniqueSuffix = Date.now() + "_" + Math.round(Math.random() * 1e6);
         const filename = `resume_${uniqueSuffix}${ext}`;
@@ -311,15 +316,19 @@ app.post("/api/upload", authMiddleware, upload.single("file"), async (req, res) 
 
     // 1. If Cloudinary is configured, upload directly to the cloud CDN
     if (isCloudinaryConfigured()) {
-      const result = await uploadToCloudinary(req.file.buffer, req.file.originalname);
-      return res.json({
-        url: result.secure_url,
-        filename: result.public_id,
-        originalName: req.file.originalname,
-        size: req.file.size,
-        mimetype: req.file.mimetype,
-        provider: "cloudinary",
-      });
+      try {
+        const result = await uploadToCloudinary(req.file.buffer, req.file.originalname);
+        return res.json({
+          url: result.secure_url,
+          filename: result.public_id,
+          originalName: req.file.originalname,
+          size: req.file.size,
+          mimetype: req.file.mimetype,
+          provider: "cloudinary",
+        });
+      } catch (cloudErr) {
+        console.warn("⚠️ Cloudinary upload failed, falling back to local storage:", cloudErr.message);
+      }
     }
 
     // 2. Fallback: Save to local uploads directory
